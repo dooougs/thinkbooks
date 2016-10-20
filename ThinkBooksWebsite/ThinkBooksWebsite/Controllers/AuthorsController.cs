@@ -1,27 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 using System.Web.Mvc;
+using ThinkBooksWebsite.Models;
 using ThinkBooksWebsite.Services;
 
 namespace ThinkBooksWebsite.Controllers
 {
-    public class Author
-    {
-        public int AuthorID { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public DateTime DateOfBirth { get; set; }
-    }
-
     public class AuthorsController : Controller
     {
         // GET: Authors - the default view too ie /
-        public ActionResult Index()
+        public ActionResult Index(string sortOrder = "LastName", string sortDirection = "ASC")
         {
-            var db = new AuthorRepository();
-            List<Author> authors = db.GetAuthors();
+            var db = new AuthorsRepository();
+            List<Author> authors = db.GetAuthors(sortOrder, sortDirection);
             return View(authors);
         }
     }
