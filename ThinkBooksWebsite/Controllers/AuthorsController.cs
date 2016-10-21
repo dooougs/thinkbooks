@@ -8,10 +8,11 @@ namespace ThinkBooksWebsite.Controllers
 {
     public class AuthorsController : Controller
     {
+        AuthorsRepository db = new AuthorsRepository();
+
         public ActionResult Index(string s = "LastName", int? authorIDFilter = null, string firstNameFilter = null, string lastNameFilter = null, DateTime? dateOfBirthFilter = null)
         {
             var sortColumnAndDirection = s;
-            var db = new AuthorsRepository();
             List<Author> authors = db.GetAuthors(sortColumnAndDirection, authorIDFilter, firstNameFilter, lastNameFilter, dateOfBirthFilter);
 
             // Flip the order of the sort param on the button so next time it is pressed with reverse current
@@ -31,6 +32,12 @@ namespace ThinkBooksWebsite.Controllers
             }
 
             return View(authors);
+        }
+
+        public ActionResult LoadDataSqlBulkCopyAuthorsBooks()
+        {
+            db.LoadDataSqlBulkCopyAuthorsBooks();
+            return RedirectToAction("index");
         }
     }
 }
