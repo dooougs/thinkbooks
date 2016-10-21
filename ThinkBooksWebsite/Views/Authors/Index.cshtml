@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<ThinkBooksWebsite.Models.Author>
+@using ThinkBooksWebsite.Services.HtmlHelper
 
 @*<p>
     @Html.ActionLink("Create New", "Create")
@@ -15,9 +16,19 @@
     <input type="text" name="lastNameFilter" id="lastNameFilter" value="@ViewBag.LastNameFilter" />
     <label>DateOfBirth</label>
     <input type="date" name="dateOfBirthFilter" id="dateOfBirthFilter" value="@ViewBag.DateOfBirthFilter" />
-
+    <label>Results</label>
+    <select name="results" id="results">
+        <option value="20" @Util.SetSelected(ViewBag.Results, "20")>20</option>
+        <option value="50" @Util.SetSelected(ViewBag.Results, "50")>50</option>
+        <option value="100" @Util.SetSelected(ViewBag.Results, "100")>100</option>
+        <option value="500" @Util.SetSelected(ViewBag.Results, "500")>500</option>
+        <option value="5000" @Util.SetSelected(ViewBag.Results, "5000")>5000</option>
+        <option value="all" @Util.SetSelected(ViewBag.Results, "all")>All</option>
+    </select>
     <input type="submit" value="Search"/>
+
     <p>&nbsp;</p>
+    <span class="total-results">Results: @ViewBag.TotalQueryCountOfAuthors</span>
     <table class="table">
         <tr>
             <th><button type="submit" name="s" id="sortColumnAuthorID" value="@ViewBag.SortParamAuthorID">AuthorID</button></th>

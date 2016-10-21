@@ -12,10 +12,17 @@ using System.Web.Hosting;
 
 namespace ThinkBooksWebsite.Services
 {
+    public class AuthorViewModel
+    {
+        public List<Author> Authors { get; set; }
+        public int CountOfAuthors { get; set; }
+    }
+
     public class AuthorsRepository
     {
         // Stored Proc
-        public List<Author> GetAuthors2(string sortColumnAndDirection, int? authorIDFilter, string firstNameFilter, string lastNameFilter, DateTime? dateOfBirthFilter)
+        public AuthorViewModel GetAuthors2(string sortColumnAndDirection, int? authorIDFilter, 
+            string firstNameFilter, string lastNameFilter, DateTime? dateOfBirthFilter, int numberOfResults)
         {
             using (var db = Util.GetOpenConnection())
             {
@@ -33,12 +40,23 @@ namespace ThinkBooksWebsite.Services
                 p.Add("@FirstName", firstNameFilter);
                 p.Add("@LastName", lastNameFilter);
                 p.Add("@DateOfBirth", dateOfBirthFilter);
-                return db.Query<Author>("GetAuthors", p, commandType: CommandType.StoredProcedure).ToList();
+                p.Add("@NumberOfResults", numberOfResults);
+                //return db.Query<Author>("GetAuthors", p, commandType: CommandType.StoredProcedure).ToList();
+                var x = db.QueryMultiple("GetAuthors", p, commandType: CommandType.StoredProcedure);
+                List<Author> result = x.Read<Author>().ToList();
+                var count = x.Read<int>().Single();
+                var vm = new AuthorViewModel
+                {
+                    Authors = result,
+                    CountOfAuthors = count
+                };
+                return vm;
             }
         }
 
         // Using inline SQL
-        public List<Author> GetAuthors(string sortColumnAndDirection, int? authorIDFilter, string firstNameFilter, string lastNameFilter, DateTime? dateOfBirthFilter)
+        public AuthorViewModel GetAuthors(string sortColumnAndDirection, int? authorIDFilter, 
+            string firstNameFilter, string lastNameFilter, DateTime? dateOfBirthFilter, int numberOfResults)
         {
             using (var db = Util.GetOpenConnection())
             {
@@ -54,14 +72,45 @@ namespace ThinkBooksWebsite.Services
                 var sanitizedSortColumn = commandBuilder.QuoteIdentifier(sortColumn);
 
                 var sql = @"
-                    SELECT TOP 10 * FROM Author 
+                    SELECT TOP (@numberOfResults) * FROM Author 
                     WHERE (@AuthorID IS NULL OR AuthorID = @AuthorID)
                     AND (@firstName IS NULL OR FirstName LIKE CONCAT('%',@firstName,'%'))
 	                AND (@LastName IS NULL OR LastName LIKE '%'+@LastName+'%')
 	                AND (@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)
                     ORDER BY " + sanitizedSortColumn + " " + sortDirection;
 
-                return db.Query<Author>(sql, new { authorID = authorIDFilter, firstName = firstNameFilter, lastName = lastNameFilter, dateOfBirth = dateOfBirthFilter }).ToList();
+                var result = db.Query<Author>(sql,
+                    new
+                    {
+                        authorID = authorIDFilter,
+                        firstName = firstNameFilter,
+                        lastName = lastNameFilter,
+                        dateOfBirth = dateOfBirthFilter,
+                        numberOfResults
+                    }).ToList();
+
+                var sqlCount = @"
+                    SELECT COUNT(*) FROM Author
+                    WHERE(@AuthorID IS NULL OR AuthorID = @AuthorID)
+                    AND(@firstName IS NULL OR FirstName LIKE CONCAT('%', @firstName, '%'))
+                    AND(@LastName IS NULL OR LastName LIKE '%' + @LastName + '%')
+                    AND(@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)";
+
+                var count = db.Query<int>(sqlCount, new
+                {
+                    authorID = authorIDFilter,
+                    firstName = firstNameFilter,
+                    lastName = lastNameFilter,
+                    dateOfBirth = dateOfBirthFilter
+                }).Single();
+
+                var vm = new AuthorViewModel
+                {
+                    Authors = result,
+                    CountOfAuthors = count
+                };
+
+                return vm;
             }
         }
 

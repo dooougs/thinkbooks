@@ -10,10 +10,22 @@ namespace ThinkBooksWebsite.Controllers
     {
         AuthorsRepository db = new AuthorsRepository();
 
-        public ActionResult Index(string s = "LastName", int? authorIDFilter = null, string firstNameFilter = null, string lastNameFilter = null, DateTime? dateOfBirthFilter = null)
+        public ActionResult Index(string s = "LastName", int? authorIDFilter = null, string firstNameFilter = null, 
+            string lastNameFilter = null, DateTime? dateOfBirthFilter = null, string results = "50")
         {
             var sortColumnAndDirection = s;
-            List<Author> authors = db.GetAuthors(sortColumnAndDirection, authorIDFilter, firstNameFilter, lastNameFilter, dateOfBirthFilter);
+
+            int numberOfResults = 0;
+            if (!int.TryParse(results, out numberOfResults))
+            {
+                // All selected so limit to 1m
+                numberOfResults = 1000000;
+            }
+            var vm = db.GetAuthors(sortColumnAndDirection, authorIDFilter, firstNameFilter, lastNameFilter,
+                dateOfBirthFilter, numberOfResults);
+
+            List<Author> authors = vm.Authors;
+            ViewBag.TotalQueryCountOfAuthors = vm.CountOfAuthors;
 
             // Flip the order of the sort param on the button so next time it is pressed with reverse current
             ViewBag.SortParamAuthorID = sortColumnAndDirection == "AuthorID" ? "AuthorID_desc" : "AuthorID";
@@ -30,6 +42,9 @@ namespace ThinkBooksWebsite.Controllers
             {
                 ViewBag.DateOfBirthFilter = Convert.ToDateTime(dateOfBirthFilter).ToString("yyyy-MM-dd");
             }
+
+            // Keep number of results sticky
+            ViewBag.Results = results;
 
             return View(authors);
         }

@@ -2,9 +2,18 @@
 CREATE PROCEDURE [dbo].[GetAuthors]
 	@SortColumn nvarchar(20) 
 	,@SortDirection nvarchar(4)
+	,@AuthorID int
+	,@FirstName nvarchar(255)
+	,@LastName nvarchar(255)
+	,@DateOfBirth datetime
+	,@NumberOfResults int
 AS
 BEGIN
-    SELECT * FROM Author
+    SELECT TOP (@NumberOfResults) * FROM Author
+	WHERE (@AuthorID IS NULL OR AuthorID = @AuthorID)
+	AND (@FirstName IS NULL OR FirstName LIKE '%'+@FirstName+'%')
+	AND (@LastName IS NULL OR LastName LIKE '%'+@LastName+'%')
+	AND (@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)
 	ORDER BY
 	  --int
 	  CASE WHEN @SortDirection = 'ASC' THEN
@@ -43,4 +52,11 @@ BEGIN
 			WHEN 'DateOfBirth' THEN DateOfBirth
 		  END
 	  END DESC
+
+	-- Count
+	SELECT COUNT(*) FROM Author
+	WHERE (@AuthorID IS NULL OR AuthorID = @AuthorID)
+	AND (@FirstName IS NULL OR FirstName LIKE '%'+@FirstName+'%')
+	AND (@LastName IS NULL OR LastName LIKE '%'+@LastName+'%')
+	AND (@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)
 END

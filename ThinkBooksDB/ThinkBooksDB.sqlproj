@@ -67,4 +67,7 @@
     <Build Include="dbo\Tables\Author.sql" />
     <Build Include="dbo\Stored Procedures\GetAuthors.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="SqlSchemaCompare.scmp" />
+  </ItemGroup>
 </Project>
