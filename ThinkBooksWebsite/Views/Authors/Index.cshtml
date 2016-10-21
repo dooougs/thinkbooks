@@ -1,10 +1,23 @@
 ﻿@model IEnumerable<ThinkBooksWebsite.Models.Author>
 
-<p>
+@*<p>
     @Html.ActionLink("Create New", "Create")
-</p>
+</p>*@
+<p>&nbsp;</p>
 
 <form method="get">
+    
+    <label>AuthorID</label>
+    <input type="text" size="5" name="authorIDFilter" id="authorIDFilter" value="@ViewBag.AuthorIDFilter" />
+    <label>FirstName</label>
+    <input type="text" name="firstNameFilter" id="firstNameFilter" value="@ViewBag.FirstNameFilter" />
+    <label>LastName</label>
+    <input type="text" name="lastNameFilter" id="lastNameFilter" value="@ViewBag.LastNameFilter" />
+    <label>DateOfBirth</label>
+    <input type="date" name="dateOfBirthFilter" id="dateOfBirthFilter" value="@ViewBag.DateOfBirthFilter" />
+
+    <input type="submit" value="Search"/>
+    <p>&nbsp;</p>
     <table class="table">
         <tr>
             <th><button type="submit" name="s" id="sortColumnAuthorID" value="@ViewBag.SortParamAuthorID">AuthorID</button></th>
@@ -29,11 +42,11 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.DateOfBirth)
                 </td>
-                <td>
-                    @Html.ActionLink("Edit", "Edit", new { id = item.AuthorID }) |
-                    @Html.ActionLink("Details", "Details", new { id = item.AuthorID }) |
-                    @Html.ActionLink("Delete", "Delete", new { id = item.AuthorID })
-                </td>
+                @*<td>
+                    @Html.ActionLink("Edit", "Edit", new {id = item.AuthorID}) |
+                    @Html.ActionLink("Details", "Details", new {id = item.AuthorID}) |
+                    @Html.ActionLink("Delete", "Delete", new {id = item.AuthorID})
+                </td>*@
             </tr>
         }
 

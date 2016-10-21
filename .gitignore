@@ -238,3 +238,5 @@ _Pvt_Extensions
 .fake/
 
 log-file.txt
+# DM - Database project causing file locks
+*.jfm

@@ -5,32 +5,37 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 using ThinkBooksWebsite.Models;
+using System;
 
 namespace ThinkBooksWebsite.Services
 {
     public class AuthorsRepository
     {
         // Stored Proc
-        //public List<Author> GetAuthors(string sortColumnAndDirection)
-        //{
-        //    using (var db = Util.GetOpenConnection())
-        //    {
-        //        var p = new DynamicParameters();
-        //        var sortDirection = "ASC";
-        //        var sortColumn = sortColumnAndDirection;
-        //        if (sortColumnAndDirection.EndsWith("_desc"))
-        //        {
-        //            sortDirection = "DESC";
-        //            sortColumn = sortColumn.Substring(0, sortColumnAndDirection.Length - 5);
-        //        }
-        //        p.Add("@SortColumn", sortColumn);
-        //        p.Add("@SortDirection", sortDirection);
-        //        return db.Query<Author>("GetAuthors", p, commandType: CommandType.StoredProcedure).ToList();
-        //    }
-        //}
+        public List<Author> GetAuthors2(string sortColumnAndDirection, int? authorIDFilter, string firstNameFilter, string lastNameFilter, DateTime? dateOfBirthFilter)
+        {
+            using (var db = Util.GetOpenConnection())
+            {
+                var p = new DynamicParameters();
+                var sortDirection = "ASC";
+                var sortColumn = sortColumnAndDirection;
+                if (sortColumnAndDirection.EndsWith("_desc"))
+                {
+                    sortDirection = "DESC";
+                    sortColumn = sortColumn.Substring(0, sortColumnAndDirection.Length - 5);
+                }
+                p.Add("@SortColumn", sortColumn);
+                p.Add("@SortDirection", sortDirection);
+                p.Add("@AuthorID", authorIDFilter);
+                p.Add("@FirstName", firstNameFilter);
+                p.Add("@LastName", lastNameFilter);
+                p.Add("@DateOfBirth", dateOfBirthFilter);
+                return db.Query<Author>("GetAuthors", p, commandType: CommandType.StoredProcedure).ToList();
+            }
+        }
 
         // Using inline SQL
-        public List<Author> GetAuthors(string sortColumnAndDirection)
+        public List<Author> GetAuthors(string sortColumnAndDirection, int? authorIDFilter, string firstNameFilter, string lastNameFilter, DateTime? dateOfBirthFilter)
         {
             using (var db = Util.GetOpenConnection())
             {
@@ -42,14 +47,18 @@ namespace ThinkBooksWebsite.Services
                     sortColumn = sortColumn.Substring(0, sortColumnAndDirection.Length - 5);
                 }
 
-                // Making sure it can only be set to DESC or ASC
-                string sanitizedSortDirection = sortDirection == "DESC" ? "DESC" : "ASC";
+                var commandBuilder = new SqlCommandBuilder();
+                var sanitizedSortColumn = commandBuilder.QuoteIdentifier(sortColumn);
 
-                DbCommandBuilder commandBuilder = new SqlCommandBuilder();
-                string sanitizedSortColumn = commandBuilder.QuoteIdentifier(sortColumn);
+                var sql = @"
+                    SELECT * FROM Author 
+                    WHERE (@AuthorID IS NULL OR AuthorID = @AuthorID)
+                    AND (@firstName IS NULL OR FirstName LIKE CONCAT('%',@firstName,'%'))
+	                AND (@LastName IS NULL OR LastName LIKE '%'+@LastName+'%')
+	                AND (@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)
+                    ORDER BY " + sanitizedSortColumn + " " + sortDirection;
 
-                var sql = "SELECT * FROM Author WHERE FirstName LIKE CONCAT('%',@firstName,'%') ORDER BY " + sanitizedSortColumn + " " + sanitizedSortDirection;
-                return db.Query<Author>(sql, new { firstName = "Ali"}).ToList();
+                return db.Query<Author>(sql, new { authorID = authorIDFilter, firstName = firstNameFilter, lastName = lastNameFilter, dateOfBirth = dateOfBirthFilter }).ToList();
             }
         }
 
