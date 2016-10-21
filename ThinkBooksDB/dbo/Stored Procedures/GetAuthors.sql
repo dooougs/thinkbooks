@@ -1,21 +1,19 @@
-﻿-- =============================================
--- Author:		<Author,,Name>
--- Create date: <Create Date,,>
--- Description:	<Description,,>
--- =============================================
-CREATE PROCEDURE GetAuthors
-	@SortColumn nvarchar(20) = 'AuthorID'
-	,@SortDirection nvarchar(5) = 'ASC' -- default for ease of testing
+﻿
+CREATE PROCEDURE [dbo].[GetAuthors]
+	@SortColumn nvarchar(20) 
+	,@SortDirection nvarchar(4)
 AS
 BEGIN
-	-- SET NOCOUNT ON added to prevent extra result sets from
-	-- interfering with SELECT statements.
-	SET NOCOUNT ON;
-
     SELECT * FROM Author
 	ORDER BY
-	  --nvarchar
+	  --int
 	  CASE WHEN @SortDirection = 'ASC' THEN
+		  CASE @SortColumn
+			WHEN 'AuthorID' THEN AuthorID
+		  END
+	  END ASC
+	  --nvarchar
+	  ,CASE WHEN @SortDirection = 'ASC' THEN
 		  CASE @SortColumn
 			WHEN 'FirstName' THEN FirstName
 			WHEN 'LastName' THEN LastName
@@ -27,6 +25,12 @@ BEGIN
 			WHEN 'DateOfBirth' THEN DateOfBirth
 		  END
 	  END ASC
+	   --int
+	  ,CASE WHEN @SortDirection = 'DESC' THEN
+		  CASE @SortColumn
+			WHEN 'AuthorID' THEN AuthorID
+		  END
+	  END DESC
 	  ,CASE WHEN @SortDirection = 'DESC' THEN
 		  CASE @SortColumn
 			WHEN 'FirstName' THEN FirstName
@@ -39,6 +43,4 @@ BEGIN
 			WHEN 'DateOfBirth' THEN DateOfBirth
 		  END
 	  END DESC
-		
-
 END
