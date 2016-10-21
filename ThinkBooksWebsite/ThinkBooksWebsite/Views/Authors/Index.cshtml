@@ -7,18 +7,10 @@
 <form method="get">
     <table class="table">
         <tr>
-            <th>AuthorID</th>
-
-            <th>
-                <button type="submit" name="sortOrder" id="sortOrderFirstName" value="@ViewBag.FirstNameSortParam">First Name</button>
-                @*@Html.DisplayNameFor(model => model.FirstName)*@
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LastName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DateOfBirth)
-            </th>
+            <th><button type="submit" name="s" id="sortColumnAuthorID" value="@ViewBag.SortParamAuthorID">AuthorID</button></th>
+            <th><button type="submit" name="s" id="sortColumnFirstName" value="@ViewBag.SortParamFirstName">First Name</button></th>
+            <th><button type="submit" name="s" id="sortColumnLastName" value="@ViewBag.SortParamLastName">Last Name</button></th>
+            <th><button type="submit" name="s" id="sortColumnDateOfBirth" value="@ViewBag.SortParamDateOfBirth">Date Of Birth</button></th>
             <th></th>
         </tr>
 
@@ -26,7 +18,7 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.FirstName)
+                    @Html.DisplayFor(modelItem => item.AuthorID)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.FirstName)
@@ -38,9 +30,9 @@
                     @Html.DisplayFor(modelItem => item.DateOfBirth)
                 </td>
                 <td>
-                    @Html.ActionLink("Edit", "Edit", new {id = item.AuthorID}) |
-                    @Html.ActionLink("Details", "Details", new {id = item.AuthorID}) |
-                    @Html.ActionLink("Delete", "Delete", new {id = item.AuthorID})
+                    @Html.ActionLink("Edit", "Edit", new { id = item.AuthorID }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.AuthorID }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.AuthorID })
                 </td>
             </tr>
         }
