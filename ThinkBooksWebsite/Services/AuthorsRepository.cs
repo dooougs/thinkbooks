@@ -21,7 +21,7 @@ namespace ThinkBooksWebsite.Services
     public class AuthorsRepository
     {
         // Stored Proc
-        public AuthorViewModel GetAuthors2(string sortColumnAndDirection, int? authorIDFilter, 
+        public AuthorViewModel GetAuthors(string sortColumnAndDirection, int? authorIDFilter, 
             string firstNameFilter, string lastNameFilter, DateTime? dateOfBirthFilter, int numberOfResults)
         {
             using (var db = Util.GetOpenConnection())
@@ -34,28 +34,34 @@ namespace ThinkBooksWebsite.Services
                     sortDirection = "DESC";
                     sortColumn = sortColumn.Substring(0, sortColumnAndDirection.Length - 5);
                 }
+                //p.Add("@SortColumn", sortColumn);
+                //p.Add("@SortDirection", sortDirection);
+
                 p.Add("@SortColumn", sortColumn);
                 p.Add("@SortDirection", sortDirection);
+
                 p.Add("@AuthorID", authorIDFilter);
                 p.Add("@FirstName", firstNameFilter);
                 p.Add("@LastName", lastNameFilter);
                 p.Add("@DateOfBirth", dateOfBirthFilter);
                 p.Add("@NumberOfResults", numberOfResults);
-                //return db.Query<Author>("GetAuthors", p, commandType: CommandType.StoredProcedure).ToList();
-                var x = db.QueryMultiple("GetAuthors", p, commandType: CommandType.StoredProcedure);
-                List<Author> result = x.Read<Author>().ToList();
-                var count = x.Read<int>().Single();
-                var vm = new AuthorViewModel
-                {
-                    Authors = result,
-                    CountOfAuthors = count
-                };
+                var y = db.Query<Author>("GetAuthors", p, commandType: CommandType.StoredProcedure).ToList();
+                var vm = new AuthorViewModel {Authors = y};
+
+                //var x = db.QueryMultiple("GetAuthors", p, commandType: CommandType.StoredProcedure);
+                //List<Author> result = x.Read<Author>().ToList();
+                //var count = x.Read<int>().Single();
+                //var vm = new AuthorViewModel
+                //{
+                //    Authors = result,
+                //    CountOfAuthors = count
+                //};
                 return vm;
             }
         }
 
         // Using inline SQL
-        public AuthorViewModel GetAuthors(string sortColumnAndDirection, int? authorIDFilter, 
+        public AuthorViewModel GetAuthors2(string sortColumnAndDirection, int? authorIDFilter, 
             string firstNameFilter, string lastNameFilter, DateTime? dateOfBirthFilter, int numberOfResults)
         {
             using (var db = Util.GetOpenConnection())
@@ -72,9 +78,9 @@ namespace ThinkBooksWebsite.Services
                 var sanitizedSortColumn = commandBuilder.QuoteIdentifier(sortColumn);
 
                 var sql = @"
-                    SELECT TOP (@numberOfResults) * FROM Author 
+                    SELECT TOP (@NumberOfResults) * FROM Author 
                     WHERE (@AuthorID IS NULL OR AuthorID = @AuthorID)
-                    AND (@firstName IS NULL OR FirstName LIKE CONCAT('%',@firstName,'%'))
+                    AND (@FirstName IS NULL OR FirstName LIKE CONCAT('%',@FirstName,'%'))
 	                AND (@LastName IS NULL OR LastName LIKE '%'+@LastName+'%')
 	                AND (@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)
                     ORDER BY " + sanitizedSortColumn + " " + sortDirection;
@@ -82,32 +88,32 @@ namespace ThinkBooksWebsite.Services
                 var result = db.Query<Author>(sql,
                     new
                     {
-                        authorID = authorIDFilter,
-                        firstName = firstNameFilter,
-                        lastName = lastNameFilter,
-                        dateOfBirth = dateOfBirthFilter,
+                        AuthorID = authorIDFilter,
+                        FirstName = firstNameFilter,
+                        LastName = lastNameFilter,
+                        DateOfBirth = dateOfBirthFilter,
                         numberOfResults
                     }).ToList();
 
-                var sqlCount = @"
-                    SELECT COUNT(*) FROM Author
-                    WHERE(@AuthorID IS NULL OR AuthorID = @AuthorID)
-                    AND(@firstName IS NULL OR FirstName LIKE CONCAT('%', @firstName, '%'))
-                    AND(@LastName IS NULL OR LastName LIKE '%' + @LastName + '%')
-                    AND(@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)";
+                //var sqlCount = @"
+                //    SELECT COUNT(*) FROM Author
+                //    WHERE(@AuthorID IS NULL OR AuthorID = @AuthorID)
+                //    AND(@firstName IS NULL OR FirstName LIKE CONCAT('%', @firstName, '%'))
+                //    AND(@LastName IS NULL OR LastName LIKE '%' + @LastName + '%')
+                //    AND(@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)";
 
-                var count = db.Query<int>(sqlCount, new
-                {
-                    authorID = authorIDFilter,
-                    firstName = firstNameFilter,
-                    lastName = lastNameFilter,
-                    dateOfBirth = dateOfBirthFilter
-                }).Single();
+                //var count = db.Query<int>(sqlCount, new
+                //{
+                //    authorID = authorIDFilter,
+                //    firstName = firstNameFilter,
+                //    lastName = lastNameFilter,
+                //    dateOfBirth = dateOfBirthFilter
+                //}).Single();
 
                 var vm = new AuthorViewModel
                 {
                     Authors = result,
-                    CountOfAuthors = count
+                    //CountOfAuthors = count
                 };
 
                 return vm;
@@ -128,7 +134,7 @@ namespace ThinkBooksWebsite.Services
             var numberInBatch = 10000;
             var numberOfBatches = 25;
 
-            //DropConstraintsAndTruncateTables();
+            TruncateTable();
 
             var firstnames = LoadFirstNames();
             var surnames = LoadSurnames();
@@ -194,21 +200,21 @@ namespace ThinkBooksWebsite.Services
             return firstnames;
         }
 
-        //private static void DropConstraintsAndTruncateTables()
-        //{
-        //    using (var c = Util.GetOpenConnection())
-        //    {
-        //        try
-        //        {
-        //            c.Execute("ALTER TABLE [dbo].[Books] DROP CONSTRAINT [FK_Books_ToAuthor]");
-        //        }
-        //        catch
-        //        {
-        //        }
+        private static void TruncateTable()
+        {
+            using (var c = Util.GetOpenConnection())
+            {
+                //try
+                //{
+                //    c.Execute("ALTER TABLE [dbo].[Books] DROP CONSTRAINT [FK_Books_ToAuthor]");
+                //}
+                //catch
+                //{
+                //}
 
-        //        c.Execute("TRUNCATE TABLE Books; TRUNCATE TABLE Authors");
-        //    }
-        //}
+                c.Execute("TRUNCATE TABLE Author;");
+            }
+        }
 
         //private DataTable BuildDataTableBooks(int from, int count, List<string> words)
         //{
@@ -237,6 +243,7 @@ namespace ThinkBooksWebsite.Services
             dt.Columns.Add("AuthorID", typeof(int));
             dt.Columns.Add("FirstName", typeof(string));
             dt.Columns.Add("LastName", typeof(string));
+            dt.Columns.Add("DateOfBirth", typeof(DateTime));
             //dt.Columns.Add("EmailAddress", typeof(string));
 
             for (int i = from; i < from + count; i++)
@@ -245,7 +252,7 @@ namespace ThinkBooksWebsite.Services
                 DataRow row = dt.NewRow();
                 // this looks like AuthorID initially will be 0, however it is 1 (identity).. so its just a key for the dt?
                 //row.ItemArray = new object[] { i, author.FirstName, author.LastName, author.EmailAddress };
-                row.ItemArray = new object[] { i, author.FirstName, author.LastName };
+                row.ItemArray = new object[] { i, author.FirstName, author.LastName, author.DateOfBirth };
                 dt.Rows.Add(row);
             }
             return dt;
@@ -256,9 +263,13 @@ namespace ThinkBooksWebsite.Services
             var r = GetRandom();
             string firstname = firstnames[r.Next(firstnames.Count)].CapitaliseFirstLetter();
             string surname = surnames[r.Next(surnames.Count)].CapitaliseFirstLetter();
+            var year = r.Next(1930, 2010);
+            var month = r.Next(1, 13);
+            var day = r.Next(1, 28);
+            DateTime dateOfBirth = new DateTime(year, month, day);
             //string email = firstname + "@" + surname + ".com";
             //return new Author { FirstName = firstname, LastName = surname, EmailAddress = email };
-            return new Author { FirstName = firstname, LastName = surname };
+            return new Author { FirstName = firstname, LastName = surname, DateOfBirth = dateOfBirth};
         }
 
         // To stop similar random numbers use the same Random instance

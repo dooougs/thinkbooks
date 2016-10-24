@@ -50,8 +50,8 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.LastName)
                 </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DateOfBirth)
+                <td>@item.DateOfBirth.ToShortDateString()
+                    @*@Html.DisplayFor(modelItem => item.DateOfBirth)*@
                 </td>
                 @*<td>
                     @Html.ActionLink("Edit", "Edit", new {id = item.AuthorID}) |

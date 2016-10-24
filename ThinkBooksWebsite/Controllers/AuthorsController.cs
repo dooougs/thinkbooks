@@ -10,12 +10,12 @@ namespace ThinkBooksWebsite.Controllers
     {
         AuthorsRepository db = new AuthorsRepository();
 
-        public ActionResult Index(string s = "LastName", int? authorIDFilter = null, string firstNameFilter = null, 
-            string lastNameFilter = null, DateTime? dateOfBirthFilter = null, string results = "50")
+        public ActionResult Index(string results = "50", string s = "LastName", int? authorIDFilter = null, string firstNameFilter = null, 
+            string lastNameFilter = null, DateTime? dateOfBirthFilter = null )
         {
             var sortColumnAndDirection = s;
 
-            int numberOfResults = 0;
+            int numberOfResults;
             if (!int.TryParse(results, out numberOfResults))
             {
                 // All selected so limit to 1m
