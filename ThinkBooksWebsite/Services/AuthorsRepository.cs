@@ -21,7 +21,7 @@ namespace ThinkBooksWebsite.Services
     public class AuthorsRepository
     {
         // Stored Proc
-        public AuthorViewModel GetAuthors(string sortColumnAndDirection, int? authorIDFilter, 
+        public AuthorViewModel GetAuthors(string sortColumnAndDirection, int? authorIDFilter,
             string firstNameFilter, string lastNameFilter, DateTime? dateOfBirthFilter, int numberOfResults)
         {
             using (var db = Util.GetOpenConnection())
@@ -41,27 +41,46 @@ namespace ThinkBooksWebsite.Services
                 p.Add("@SortDirection", sortDirection);
 
                 p.Add("@AuthorID", authorIDFilter);
-                p.Add("@FirstName", firstNameFilter);
-                p.Add("@LastName", lastNameFilter);
+                if (firstNameFilter == "")
+                    p.Add("@FirstName", null);
+                else
+                    p.Add("@FirstName", firstNameFilter);
+
+                if (lastNameFilter == "")
+                    p.Add("@LastName", null);
+                else
+                    p.Add("@LastName", lastNameFilter);
+
                 p.Add("@DateOfBirth", dateOfBirthFilter);
                 p.Add("@NumberOfResults", numberOfResults);
-                var y = db.Query<Author>("GetAuthors", p, commandType: CommandType.StoredProcedure).ToList();
-                var vm = new AuthorViewModel {Authors = y};
+                //var y = db.Query<Author>("GetAuthors", p, commandType: CommandType.StoredProcedure).ToList();
 
-                //var x = db.QueryMultiple("GetAuthors", p, commandType: CommandType.StoredProcedure);
-                //List<Author> result = x.Read<Author>().ToList();
-                //var count = x.Read<int>().Single();
+                var x = db.QueryMultiple("GetAuthors", p, commandType: CommandType.StoredProcedure);
+                List<Author> result = x.Read<Author>().ToList();
+                var count = x.Read<int>().Single();
+                var vm = new AuthorViewModel
+                {
+                    Authors = result,
+                    CountOfAuthors = count
+                };
+
+                //p = new DynamicParameters();
+                //p.Add("@AuthorID", authorIDFilter);
+                //p.Add("@FirstName", firstNameFilter);
+                //p.Add("@LastName", lastNameFilter);
+                //p.Add("@DateOfBirth", dateOfBirthFilter);
+                //var z = db.Query<int>("GetAuthorsCount", p, commandType: CommandType.StoredProcedure).FirstOrDefault();
                 //var vm = new AuthorViewModel
                 //{
-                //    Authors = result,
-                //    CountOfAuthors = count
+                //    Authors = y,
+                //    CountOfAuthors = z
                 //};
                 return vm;
             }
         }
 
         // Using inline SQL
-        public AuthorViewModel GetAuthors2(string sortColumnAndDirection, int? authorIDFilter, 
+        public AuthorViewModel GetAuthors2(string sortColumnAndDirection, int? authorIDFilter,
             string firstNameFilter, string lastNameFilter, DateTime? dateOfBirthFilter, int numberOfResults)
         {
             using (var db = Util.GetOpenConnection())
@@ -269,7 +288,7 @@ namespace ThinkBooksWebsite.Services
             DateTime dateOfBirth = new DateTime(year, month, day);
             //string email = firstname + "@" + surname + ".com";
             //return new Author { FirstName = firstname, LastName = surname, EmailAddress = email };
-            return new Author { FirstName = firstname, LastName = surname, DateOfBirth = dateOfBirth};
+            return new Author { FirstName = firstname, LastName = surname, DateOfBirth = dateOfBirth };
         }
 
         // To stop similar random numbers use the same Random instance
@@ -281,7 +300,7 @@ namespace ThinkBooksWebsite.Services
             return rnd;
         }
 
-       
+
 
         //public List<Book> MakeRandomNumberOfBooks(List<string> words)
         //{

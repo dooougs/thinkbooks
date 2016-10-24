@@ -6,3 +6,20 @@
     PRIMARY KEY CLUSTERED ([AuthorID] ASC)
 );
 
+
+
+
+GO
+CREATE NONCLUSTERED INDEX [NonClusteredIndex-LastName]
+    ON [dbo].[Author]([LastName] ASC);
+
+
+GO
+CREATE NONCLUSTERED INDEX [NonClusteredIndex-FirstName]
+    ON [dbo].[Author]([FirstName] ASC);
+
+
+GO
+CREATE NONCLUSTERED INDEX [NonClusteredIndex-DOB]
+    ON [dbo].[Author]([DateOfBirth] ASC);
+
