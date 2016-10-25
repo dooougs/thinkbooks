@@ -34,20 +34,18 @@ namespace ThinkBooksWebsite.Services
                     sortDirection = "DESC";
                     sortColumn = sortColumn.Substring(0, sortColumnAndDirection.Length - 5);
                 }
-                //p.Add("@SortColumn", sortColumn);
-                //p.Add("@SortDirection", sortDirection);
 
                 p.Add("@SortColumn", sortColumn);
                 p.Add("@SortDirection", sortDirection);
 
                 p.Add("@AuthorID", authorIDFilter);
                 if (firstNameFilter == "")
-                    p.Add("@FirstName", null);
+                    p.Add("@FirstName");
                 else
                     p.Add("@FirstName", firstNameFilter);
 
                 if (lastNameFilter == "")
-                    p.Add("@LastName", null);
+                    p.Add("@LastName");
                 else
                     p.Add("@LastName", lastNameFilter);
 
@@ -64,17 +62,6 @@ namespace ThinkBooksWebsite.Services
                     CountOfAuthors = count
                 };
 
-                //p = new DynamicParameters();
-                //p.Add("@AuthorID", authorIDFilter);
-                //p.Add("@FirstName", firstNameFilter);
-                //p.Add("@LastName", lastNameFilter);
-                //p.Add("@DateOfBirth", dateOfBirthFilter);
-                //var z = db.Query<int>("GetAuthorsCount", p, commandType: CommandType.StoredProcedure).FirstOrDefault();
-                //var vm = new AuthorViewModel
-                //{
-                //    Authors = y,
-                //    CountOfAuthors = z
-                //};
                 return vm;
             }
         }
