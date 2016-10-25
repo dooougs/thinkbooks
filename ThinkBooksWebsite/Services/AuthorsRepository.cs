@@ -21,7 +21,7 @@ namespace ThinkBooksWebsite.Services
     public class AuthorsRepository
     {
         // Stored Proc
-        public AuthorViewModel GetAuthors(string sortColumnAndDirection, int? authorIDFilter,
+        public AuthorViewModel GetAuthors2(string sortColumnAndDirection, int? authorIDFilter,
             string firstNameFilter, string lastNameFilter, DateTime? dateOfBirthFilter, int numberOfResults)
         {
             using (var db = Util.GetOpenConnection())
@@ -51,23 +51,22 @@ namespace ThinkBooksWebsite.Services
 
                 p.Add("@DateOfBirth", dateOfBirthFilter);
                 p.Add("@NumberOfResults", numberOfResults);
-                //var y = db.Query<Author>("GetAuthors", p, commandType: CommandType.StoredProcedure).ToList();
 
+                // keep the main query, and count logic in 1 SP which returns 2 record sets (the results, and a single row - count)
                 var x = db.QueryMultiple("GetAuthors", p, commandType: CommandType.StoredProcedure);
-                List<Author> result = x.Read<Author>().ToList();
+                var result = x.Read<Author>().ToList();
                 var count = x.Read<int>().Single();
                 var vm = new AuthorViewModel
                 {
                     Authors = result,
                     CountOfAuthors = count
                 };
-
                 return vm;
             }
         }
 
         // Using inline SQL
-        public AuthorViewModel GetAuthors2(string sortColumnAndDirection, int? authorIDFilter,
+        public AuthorViewModel GetAuthors(string sortColumnAndDirection, int? authorIDFilter,
             string firstNameFilter, string lastNameFilter, DateTime? dateOfBirthFilter, int numberOfResults)
         {
             using (var db = Util.GetOpenConnection())
@@ -101,25 +100,40 @@ namespace ThinkBooksWebsite.Services
                         numberOfResults
                     }).ToList();
 
-                //var sqlCount = @"
-                //    SELECT COUNT(*) FROM Author
-                //    WHERE(@AuthorID IS NULL OR AuthorID = @AuthorID)
-                //    AND(@firstName IS NULL OR FirstName LIKE CONCAT('%', @firstName, '%'))
-                //    AND(@LastName IS NULL OR LastName LIKE '%' + @LastName + '%')
-                //    AND(@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)";
-
-                //var count = db.Query<int>(sqlCount, new
-                //{
-                //    authorID = authorIDFilter,
-                //    firstName = firstNameFilter,
-                //    lastName = lastNameFilter,
-                //    dateOfBirth = dateOfBirthFilter
-                //}).Single();
+                // seems super fast doing 2 queries ie don't need to do return multiple record sets
+                string sqlCount;
+                if (authorIDFilter == null && dateOfBirthFilter == null && firstNameFilter == "" && lastNameFilter == "")
+                {
+                    sqlCount = @"SELECT SUM(p.rows)
+		                        FROM sys.partitions AS p
+		                        INNER JOIN sys.tables AS t
+		                        ON p.[object_id] = t.[object_id]
+		                        INNER JOIN sys.schemas AS s
+		                        ON t.[schema_id] = s.[schema_id]
+		                        WHERE p.index_id IN (0,1) -- heap or clustered index
+		                        AND t.name = N'Author'
+		                        AND s.name = N'dbo'";
+                }
+                else
+                {
+                    sqlCount = @"SELECT COUNT(*) FROM Author
+                                WHERE(@AuthorID IS NULL OR AuthorID = @AuthorID)
+                                AND(@firstName IS NULL OR FirstName LIKE CONCAT('%', @firstName, '%'))
+                                AND(@LastName IS NULL OR LastName LIKE '%' + @LastName + '%')
+                                AND(@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)";
+                }
+                var count = db.Query<int>(sqlCount, new
+                {
+                    authorID = authorIDFilter,
+                    firstName = firstNameFilter,
+                    lastName = lastNameFilter,
+                    dateOfBirth = dateOfBirthFilter
+                }).Single();
 
                 var vm = new AuthorViewModel
                 {
                     Authors = result,
-                    //CountOfAuthors = count
+                    CountOfAuthors = count
                 };
 
                 return vm;
