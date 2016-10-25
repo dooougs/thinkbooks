@@ -13,156 +13,89 @@ using Microsoft.Ajax.Utilities;
 
 namespace ThinkBooksWebsite.Services
 {
-    public class AuthorsViewModel
+    public class BooksViewModel
     {
-        public List<Author> Authors { get; set; }
-        public int CountOfAuthors { get; set; }
+        public List<Book> Books { get; set; }
+        public int CountOfBooks { get; set; }
     }
 
-    public class AuthorsRepository
+    public class BooksRepository
     {
-        // Stored Proc
-        public AuthorsViewModel GetAuthors2(string sortColumnAndDirection, int? authorIDFilter,
-            string firstNameFilter, string lastNameFilter, DateTime? dateOfBirthFilter, int numberOfResults)
+        //    public BooksViewModel GetBooks(string sortColumnAndDirection, int numberOfResults, int currentPage, int? bookIDFilter,
+        //        string titleFilter)
+        public BooksViewModel GetBooks()
         {
             using (var db = Util.GetOpenConnection())
             {
-                var p = new DynamicParameters();
-                var sortDirection = "ASC";
-                var sortColumn = sortColumnAndDirection;
-                if (sortColumnAndDirection.EndsWith("_desc"))
-                {
-                    sortDirection = "DESC";
-                    sortColumn = sortColumn.Substring(0, sortColumnAndDirection.Length - 5);
-                }
+                //var sortDirection = "ASC";
+                //var sortColumn = sortColumnAndDirection;
+                //if (sortColumnAndDirection.EndsWith("_desc"))
+                //{
+                //    sortDirection = "DESC";
+                //    sortColumn = sortColumn.Substring(0, sortColumnAndDirection.Length - 5);
+                //}
 
-                p.Add("@SortColumn", sortColumn);
-                p.Add("@SortDirection", sortDirection);
+                //var commandBuilder = new SqlCommandBuilder();
+                //var sanitizedSortColumn = commandBuilder.QuoteIdentifier(sortColumn);
 
-                p.Add("@AuthorID", authorIDFilter);
-                if (firstNameFilter == "")
-                    p.Add("@FirstName");
-                else
-                    p.Add("@FirstName", firstNameFilter);
-
-                if (lastNameFilter == "")
-                    p.Add("@LastName");
-                else
-                    p.Add("@LastName", lastNameFilter);
-
-                p.Add("@DateOfBirth", dateOfBirthFilter);
-                p.Add("@NumberOfResults", numberOfResults);
-                p.Add("@PageNumber", 2);
-
-                // keep the main query, and count logic in 1 SP which returns 2 record sets (the results, and a single row - count)
-                var x = db.QueryMultiple("GetAuthors", p, commandType: CommandType.StoredProcedure);
-                var result = x.Read<Author>().ToList();
-                var count = x.Read<int>().Single();
-                var vm = new AuthorsViewModel
-                {
-                    Authors = result,
-                    CountOfAuthors = count
-                };
-                return vm;
-            }
-        }
-
-        // Using inline SQL
-        public AuthorsViewModel GetAuthors(string sortColumnAndDirection, int? authorIDFilter,
-            string firstNameFilter, string lastNameFilter, DateTime? dateOfBirthFilter, int numberOfResults, int currentPage)
-        {
-            using (var db = Util.GetOpenConnection())
-            {
-                var sortDirection = "ASC";
-                var sortColumn = sortColumnAndDirection;
-                if (sortColumnAndDirection.EndsWith("_desc"))
-                {
-                    sortDirection = "DESC";
-                    sortColumn = sortColumn.Substring(0, sortColumnAndDirection.Length - 5);
-                }
-
-                var commandBuilder = new SqlCommandBuilder();
-                var sanitizedSortColumn = commandBuilder.QuoteIdentifier(sortColumn);
-
+                //var offset = (currentPage - 1) * numberOfResults;
+                var sql = "SELECT * FROM Book";
                 //var sql = @"
-                //    SELECT TOP (@NumberOfResults) * FROM Author 
+                //    SELECT * FROM Author 
                 //    WHERE (@AuthorID IS NULL OR AuthorID = @AuthorID)
                 //    AND (@FirstName IS NULL OR FirstName LIKE CONCAT('%',@FirstName,'%'))
-                // AND (@LastName IS NULL OR LastName LIKE '%'+@LastName+'%')
-                // AND (@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)
-                //    ORDER BY " + sanitizedSortColumn + " " + sortDirection;
+                //    AND (@LastName IS NULL OR LastName LIKE '%'+@LastName+'%')
+                //    AND (@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)
+                //    ORDER BY " + sanitizedSortColumn + " " + sortDirection + @"
+                //    OFFSET "+ offset + @" ROWS 
+                //    FETCH NEXT " + numberOfResults + " ROWS ONLY";
+                var result = db.Query<Book>(sql).ToList();
+                //var result = db.Query<Author>(sql,
+                //         new
+                //         {
+                //             AuthorID = authorIDFilter,
+                //             FirstName = firstNameFilter,
+                //             LastName = lastNameFilter,
+                //             DateOfBirth = dateOfBirthFilter,
+                //             numberOfResults,
+                //             PageNumber = currentPage
+                //         }).ToList();
 
-                // CTE (SQL2005) paging testing
-                //var sql = @"WITH ctepaging
-                // AS (
-                // SELECT *,Row_number() OVER (ORDER BY " + sanitizedSortColumn + " " + sortDirection + @") AS rownum
-                // FROM Author
-                // WHERE (@AuthorID IS NULL OR AuthorID = @AuthorID)
-                // AND (@FirstName IS NULL OR FirstName LIKE CONCAT('%',@FirstName,'%'))
-                // AND (@LastName IS NULL OR LastName LIKE '%'+@LastName+'%')
-                // AND (@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)
-                // )
-                //SELECT *
-                //FROM ctepaging
-                //WHERE rownum BETWEEN (@PageNumber-1) * @NumberOfResults+1  AND @PageNumber * @NumberOfResults";
 
-                //SQL2012 ORDER BY OFFSET FETCH
-                var offset = (currentPage - 1)*numberOfResults;
-                var sql = @"
-                    SELECT * FROM Author 
-                    WHERE (@AuthorID IS NULL OR AuthorID = @AuthorID)
-                    AND (@FirstName IS NULL OR FirstName LIKE CONCAT('%',@FirstName,'%'))
-                    AND (@LastName IS NULL OR LastName LIKE '%'+@LastName+'%')
-                    AND (@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)
-                    ORDER BY " + sanitizedSortColumn + " " + sortDirection + @"
-                    OFFSET "+ offset + @" ROWS 
-                    FETCH NEXT " + numberOfResults + " ROWS ONLY";
+                //// seems super fast doing 2 queries ie don't need to do return multiple record sets
+                //string sqlCount;
+                //if (authorIDFilter == null && dateOfBirthFilter == null && firstNameFilter.IsNullOrWhiteSpace() && lastNameFilter.IsNullOrWhiteSpace())
+                //{
+                //    sqlCount = @"SELECT SUM(p.rows)
+                //          FROM sys.partitions AS p
+                //          INNER JOIN sys.tables AS t
+                //          ON p.[object_id] = t.[object_id]
+                //          INNER JOIN sys.schemas AS s
+                //          ON t.[schema_id] = s.[schema_id]
+                //          WHERE p.index_id IN (0,1) -- heap or clustered index
+                //          AND t.name = N'Author'
+                //          AND s.name = N'dbo'";
+                //}
+                //else
+                //{
+                //    sqlCount = @"SELECT COUNT(*) FROM Author
+                //                WHERE(@AuthorID IS NULL OR AuthorID = @AuthorID)
+                //                AND(@firstName IS NULL OR FirstName LIKE CONCAT('%', @firstName, '%'))
+                //                AND(@LastName IS NULL OR LastName LIKE '%' + @LastName + '%')
+                //                AND(@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)";
+                //}
+                //var count = db.Query<int>(sqlCount, new
+                //{
+                //    authorID = authorIDFilter,
+                //    firstName = firstNameFilter,
+                //    lastName = lastNameFilter,
+                //    dateOfBirth = dateOfBirthFilter
+                //}).Single();
 
-                var result = db.Query<Author>(sql,
-                         new
-                         {
-                             AuthorID = authorIDFilter,
-                             FirstName = firstNameFilter,
-                             LastName = lastNameFilter,
-                             DateOfBirth = dateOfBirthFilter,
-                             numberOfResults,
-                             PageNumber = currentPage
-                         }).ToList();
-
-                // seems super fast doing 2 queries ie don't need to do return multiple record sets
-                string sqlCount;
-                if (authorIDFilter == null && dateOfBirthFilter == null && firstNameFilter.IsNullOrWhiteSpace() && lastNameFilter.IsNullOrWhiteSpace())
+                var vm = new BooksViewModel
                 {
-                    sqlCount = @"SELECT SUM(p.rows)
-		                        FROM sys.partitions AS p
-		                        INNER JOIN sys.tables AS t
-		                        ON p.[object_id] = t.[object_id]
-		                        INNER JOIN sys.schemas AS s
-		                        ON t.[schema_id] = s.[schema_id]
-		                        WHERE p.index_id IN (0,1) -- heap or clustered index
-		                        AND t.name = N'Author'
-		                        AND s.name = N'dbo'";
-                }
-                else
-                {
-                    sqlCount = @"SELECT COUNT(*) FROM Author
-                                WHERE(@AuthorID IS NULL OR AuthorID = @AuthorID)
-                                AND(@firstName IS NULL OR FirstName LIKE CONCAT('%', @firstName, '%'))
-                                AND(@LastName IS NULL OR LastName LIKE '%' + @LastName + '%')
-                                AND(@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)";
-                }
-                var count = db.Query<int>(sqlCount, new
-                {
-                    authorID = authorIDFilter,
-                    firstName = firstNameFilter,
-                    lastName = lastNameFilter,
-                    dateOfBirth = dateOfBirthFilter
-                }).Single();
-
-                var vm = new AuthorsViewModel
-                {
-                    Authors = result,
-                    CountOfAuthors = count
+                    Books = result,
+                    CountOfBooks = 0
                 };
 
                 return vm;

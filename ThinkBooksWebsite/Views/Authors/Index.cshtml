@@ -29,14 +29,15 @@
 
     <p>&nbsp;</p>
     <span class="total-results">Results: @ViewBag.TotalQueryCountOfAuthors</span>
-    <span class="PageCount">PageCount: @ViewBag.PageCount</span>
+    @*<span class="PageCount">PageCount: @ViewBag.PageCount</span>*@
     <br />
     <!-- need to store current page if sort button is pressed-->
     <input type="hidden" name="currentPage" value="@ViewBag.CurrentPage"/>
-    <span>currentPage: @ViewBag.CurrentPage</span>
+    @*<span>currentPage: @ViewBag.CurrentPage</span>*@
+    <span>Page @ViewBag.CurrentPage of @ViewBag.PageCount</span>
     <!-- need to stored current sort if next or previous button pressed-->
-    <input type="hidden" name="currentSortOrder" value="@ViewBag.CurrentSortOrder" />
-    <span>currentSortOrder: @ViewBag.CurrentSortOrder</span>
+    @*<input type="hidden" name="currentSortOrder" value="@ViewBag.CurrentSortOrder" />*@
+    @*<span>currentSortOrder: @ViewBag.CurrentSortOrder</span>*@
 
     <button type="submit" name="page" id="previousPage" value="@ViewBag.PreviousPage">Previous Page</button> || 
     <button type="submit" name="page" id="nextPage" value="@ViewBag.NextPage">Next Page</button>

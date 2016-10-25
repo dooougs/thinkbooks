@@ -68,8 +68,8 @@ namespace ThinkBooksWebsite.Controllers
             var recordsPerPage =  int.Parse(results);
             int pageCount = (records + recordsPerPage - 1) / recordsPerPage;
             ViewBag.PageCount = pageCount;
-            ViewBag.NextPage = page + 1;
-            ViewBag.PreviousPage = page - 1;
+            ViewBag.NextPage = page == pageCount ? pageCount : page + 1;
+            ViewBag.PreviousPage = page == 1 ? 1 : page - 1;
 
             return View(authors);
         }
