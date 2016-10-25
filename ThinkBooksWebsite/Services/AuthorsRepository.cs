@@ -51,6 +51,7 @@ namespace ThinkBooksWebsite.Services
 
                 p.Add("@DateOfBirth", dateOfBirthFilter);
                 p.Add("@NumberOfResults", numberOfResults);
+                p.Add("@PageNumber", 2);
 
                 // keep the main query, and count logic in 1 SP which returns 2 record sets (the results, and a single row - count)
                 var x = db.QueryMultiple("GetAuthors", p, commandType: CommandType.StoredProcedure);
@@ -67,7 +68,7 @@ namespace ThinkBooksWebsite.Services
 
         // Using inline SQL
         public AuthorViewModel GetAuthors(string sortColumnAndDirection, int? authorIDFilter,
-            string firstNameFilter, string lastNameFilter, DateTime? dateOfBirthFilter, int numberOfResults)
+            string firstNameFilter, string lastNameFilter, DateTime? dateOfBirthFilter, int numberOfResults, int currentPage)
         {
             using (var db = Util.GetOpenConnection())
             {
@@ -82,13 +83,27 @@ namespace ThinkBooksWebsite.Services
                 var commandBuilder = new SqlCommandBuilder();
                 var sanitizedSortColumn = commandBuilder.QuoteIdentifier(sortColumn);
 
-                var sql = @"
-                    SELECT TOP (@NumberOfResults) * FROM Author 
-                    WHERE (@AuthorID IS NULL OR AuthorID = @AuthorID)
-                    AND (@FirstName IS NULL OR FirstName LIKE CONCAT('%',@FirstName,'%'))
-	                AND (@LastName IS NULL OR LastName LIKE '%'+@LastName+'%')
-	                AND (@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)
-                    ORDER BY " + sanitizedSortColumn + " " + sortDirection;
+                //var sql = @"
+                //    SELECT TOP (@NumberOfResults) * FROM Author 
+                //    WHERE (@AuthorID IS NULL OR AuthorID = @AuthorID)
+                //    AND (@FirstName IS NULL OR FirstName LIKE CONCAT('%',@FirstName,'%'))
+	               // AND (@LastName IS NULL OR LastName LIKE '%'+@LastName+'%')
+	               // AND (@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)
+                //    ORDER BY " + sanitizedSortColumn + " " + sortDirection;
+
+                // CTE (SQL2005) paging testing
+                var sql = @"WITH ctepaging
+			              AS (
+                            SELECT *,Row_number() OVER (ORDER BY " + sanitizedSortColumn + " " + sortDirection + @") AS rownum
+				            FROM Author
+                            WHERE (@AuthorID IS NULL OR AuthorID = @AuthorID)
+                            AND (@FirstName IS NULL OR FirstName LIKE CONCAT('%',@FirstName,'%'))
+	                        AND (@LastName IS NULL OR LastName LIKE '%'+@LastName+'%')
+	                        AND (@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)
+				            )
+			             SELECT *
+			             FROM ctepaging
+			             WHERE rownum BETWEEN (@PageNumber-1) * @NumberOfResults+1  AND @PageNumber * @NumberOfResults";
 
                 var result = db.Query<Author>(sql,
                     new
@@ -97,7 +112,8 @@ namespace ThinkBooksWebsite.Services
                         FirstName = firstNameFilter,
                         LastName = lastNameFilter,
                         DateOfBirth = dateOfBirthFilter,
-                        numberOfResults
+                        numberOfResults,
+                        PageNumber = currentPage
                     }).ToList();
 
                 // seems super fast doing 2 queries ie don't need to do return multiple record sets

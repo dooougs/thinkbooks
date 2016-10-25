@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web.Mvc;
+using System.Web.UI.WebControls;
 using ThinkBooksWebsite.Models;
 using ThinkBooksWebsite.Services;
 
@@ -10,10 +11,26 @@ namespace ThinkBooksWebsite.Controllers
     {
         AuthorsRepository db = new AuthorsRepository();
 
-        public ActionResult Index(string results = "50", string s = "LastName", int? authorIDFilter = null, string firstNameFilter = null, 
-            string lastNameFilter = null, DateTime? dateOfBirthFilter = null )
+        // using buttons - when they are not pressed, they don't send
+        // sortColumnAndDirection
+        public ActionResult Index(string sortColumnAndDirection = "AuthorID", string currentSortOrder = "AuthorID", int page = 1, int currentPage = 1, int? authorIDFilter = null, string firstNameFilter = null, 
+            string lastNameFilter = null, DateTime? dateOfBirthFilter = null, string results = "50")
         {
-            var sortColumnAndDirection = s;
+            // clicked on next or previous button, so keep the sortOrder. 
+            // unless page == 1, which means a sort button has been pressed
+            if (page != currentPage && page != 1)
+            {
+                sortColumnAndDirection = currentSortOrder;
+            } 
+
+            // have pressed a sort column, want to reset to page 1
+            if (sortColumnAndDirection != currentSortOrder)
+            {
+                page = 1;
+            }
+
+            ViewBag.CurrentSortOrder = sortColumnAndDirection;
+            ViewBag.CurrentPage = page;
 
             int numberOfResults;
             if (!int.TryParse(results, out numberOfResults))
@@ -22,7 +39,7 @@ namespace ThinkBooksWebsite.Controllers
                 numberOfResults = 1000000;
             }
             var vm = db.GetAuthors(sortColumnAndDirection, authorIDFilter, firstNameFilter, lastNameFilter,
-                dateOfBirthFilter, numberOfResults);
+                dateOfBirthFilter, numberOfResults, page);
 
             List<Author> authors = vm.Authors;
             ViewBag.TotalQueryCountOfAuthors = vm.CountOfAuthors;
@@ -45,6 +62,14 @@ namespace ThinkBooksWebsite.Controllers
 
             // Keep number of results sticky
             ViewBag.Results = results;
+
+            // paging
+            var records = vm.CountOfAuthors;
+            var recordsPerPage =  int.Parse(results);
+            int pageCount = (records + recordsPerPage - 1) / recordsPerPage;
+            ViewBag.PageCount = pageCount;
+            ViewBag.NextPage = page + 1;
+            ViewBag.PreviousPage = page - 1;
 
             return View(authors);
         }
