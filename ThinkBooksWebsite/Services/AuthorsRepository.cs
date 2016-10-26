@@ -107,12 +107,18 @@ namespace ThinkBooksWebsite.Services
                 //WHERE rownum BETWEEN (@PageNumber-1) * @NumberOfResults+1  AND @PageNumber * @NumberOfResults";
 
                 //SQL2012 ORDER BY OFFSET FETCH
+                //AND(@FirstName IS NULL OR FirstName LIKE CONCAT('%', @FirstName, '%'))
+                //AND(@LastName IS NULL OR LastName LIKE '%' + @LastName + '%')
                 var offset = (currentPage - 1)*numberOfResults;
+
+                if (firstNameFilter == "") firstNameFilter = null;
+                if (lastNameFilter == "") lastNameFilter = null;
+
                 var sql = @"
                     SELECT * FROM Author 
                     WHERE (@AuthorID IS NULL OR AuthorID = @AuthorID)
-                    AND (@FirstName IS NULL OR FirstName LIKE CONCAT('%',@FirstName,'%'))
-                    AND (@LastName IS NULL OR LastName LIKE '%'+@LastName+'%')
+                    AND (@FirstName IS NULL OR FirstName LIKE CONCAT(@FirstName,'%'))
+                    AND (@LastName IS NULL OR LastName = @LastName)
                     AND (@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)
                     ORDER BY " + sanitizedSortColumn + " " + sortDirection + @"
                     OFFSET "+ offset + @" ROWS 
