@@ -111,14 +111,17 @@ namespace ThinkBooksWebsite.Services
                 //AND(@LastName IS NULL OR LastName LIKE '%' + @LastName + '%')
                 var offset = (currentPage - 1)*numberOfResults;
 
+                // the MVC mapper will map an empty string from the firstName and lastName form post to an empty string
+                // we depend on nulls in the SQL.  Int and DateTime are okay.
                 if (firstNameFilter == "") firstNameFilter = null;
                 if (lastNameFilter == "") lastNameFilter = null;
 
+                // note % preceding a like search is much slower (250ms to 65ms) and seems a rarer business case to do that
                 var sql = @"
                     SELECT * FROM Author 
                     WHERE (@AuthorID IS NULL OR AuthorID = @AuthorID)
                     AND (@FirstName IS NULL OR FirstName LIKE CONCAT(@FirstName,'%'))
-                    AND (@LastName IS NULL OR LastName = @LastName)
+                    AND (@LastName IS NULL OR LastName LIKE CONCAT(@LastName,'%'))
                     AND (@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)
                     ORDER BY " + sanitizedSortColumn + " " + sortDirection + @"
                     OFFSET "+ offset + @" ROWS 
@@ -153,8 +156,8 @@ namespace ThinkBooksWebsite.Services
                 {
                     sqlCount = @"SELECT COUNT(*) FROM Author
                                 WHERE(@AuthorID IS NULL OR AuthorID = @AuthorID)
-                                AND(@firstName IS NULL OR FirstName LIKE CONCAT('%', @firstName, '%'))
-                                AND(@LastName IS NULL OR LastName LIKE '%' + @LastName + '%')
+                                AND(@firstName IS NULL OR FirstName LIKE CONCAT(@firstName, '%'))
+                                AND (@LastName IS NULL OR LastName LIKE CONCAT(@LastName,'%'))
                                 AND(@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)";
                 }
                 var count = db.Query<int>(sqlCount, new
