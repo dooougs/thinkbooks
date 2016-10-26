@@ -22,14 +22,15 @@
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <li>@Html.ActionLink("RefreshData", "LoadDataSqlBulkCopyAuthorsBooks", "Authors")</li>
+                <li></li>
 
 
                 <li>@Html.ActionLink("Authors (1 table)", "Index", "Authors")</li>
                     <li>@Html.ActionLink("Books (multiple talbes)", "Index", "Books")</li>
                     @*<li>@Html.ActionLink("Contact", "Contact", "Home")</li>*@
             </ul>
-            @*@Html.Partial("_LoginPartial")*@
+            @Html.Partial("_LoginPartial")
+         
         </div>
     </div>
 </div>

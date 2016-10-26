@@ -183,7 +183,7 @@ namespace ThinkBooksWebsite.Services
             var numberInBatch = 10000;
             var numberOfBatches = 25;
 
-            TruncateTable();
+            TruncateTables();
 
             var firstnames = LoadFirstNames();
             var surnames = LoadSurnames();
@@ -205,22 +205,22 @@ namespace ThinkBooksWebsite.Services
                 }
             }
 
-            //var dataTablesBooks = new List<DataTable>();
-            //for (var i = 0; i < numberOfBatches; i++)
-            //{
-            //    dataTablesBooks.Add(BuildDataTableBooks(i * numberInBatch, numberInBatch, words));
-            //}
-            //// Add Books - we know the range of AuthorID's, so can assign books appropriately
-            //foreach (var dt in dataTablesBooks)
-            //{
-            //    using (var s = new SqlBulkCopy(ConfigurationManager.ConnectionStrings["BookTechConnectionString"].ConnectionString))
-            //    {
-            //        s.DestinationTableName = "Books";
-            //        s.BatchSize = 0;
-            //        s.WriteToServer(dt);
-            //        s.Close();
-            //    }
-            //}
+            var dataTablesBooks = new List<DataTable>();
+            for (var i = 0; i < numberOfBatches; i++)
+            {
+                dataTablesBooks.Add(BuildDataTableBooks(i * numberInBatch, numberInBatch, words));
+            }
+            // Add Books - we know the range of AuthorID's, so can assign books appropriately
+            foreach (var dt in dataTablesBooks)
+            {
+                using (var s = new SqlBulkCopy(ConfigurationManager.ConnectionStrings["ThinkBooksConnectionString"].ConnectionString))
+                {
+                    s.DestinationTableName = "Book";
+                    s.BatchSize = 0;
+                    s.WriteToServer(dt);
+                    s.Close();
+                }
+            }
 
             //using (var c = Util.GetOpenConnection())
             //{
@@ -249,42 +249,42 @@ namespace ThinkBooksWebsite.Services
             return firstnames;
         }
 
-        private static void TruncateTable()
+        private static void TruncateTables()
         {
             using (var c = Util.GetOpenConnection())
             {
-                //try
-                //{
-                //    c.Execute("ALTER TABLE [dbo].[Books] DROP CONSTRAINT [FK_Books_ToAuthor]");
-                //}
-                //catch
-                //{
-                //}
+                try
+                {
+                    c.Execute("ALTER TABLE [dbo].[Book] DROP CONSTRAINT [FK_Book_Author]");
+                }
+                catch{}
 
                 c.Execute("TRUNCATE TABLE Author;");
+                c.Execute("TRUNCATE TABLE Book;");
             }
         }
 
-        //private DataTable BuildDataTableBooks(int from, int count, List<string> words)
-        //{
-        //    var dt = new DataTable();
-        //    dt.Columns.Add("BookID", typeof(int));
-        //    dt.Columns.Add("Title", typeof(string));
-        //    dt.Columns.Add("AuthorID", typeof(int));
-        //    int counter = 1;
-        //    for (int i = from; i < from + count; i++)
-        //    {
-        //        List<Book> books = MakeRandomNumberOfBooks(words);
-        //        foreach (var book in books)
-        //        {
-        //            DataRow row = dt.NewRow();
-        //            row.ItemArray = new object[] { counter, book.Title, i + 1 };
-        //            dt.Rows.Add(row);
-        //            counter++;
-        //        }
-        //    }
-        //    return dt;
-        //}
+        DataTable BuildDataTableBooks(int from, int count, List<string> words)
+        {
+            var dt = new DataTable();
+            dt.Columns.Add("BookID", typeof(int));
+            dt.Columns.Add("AuthorID", typeof(int));
+            dt.Columns.Add("Title", typeof(string));
+            
+            int counter = 1;
+            for (int i = from; i < from + count; i++)
+            {
+                List<Book> books = MakeRandomNumberOfBooks(words);
+                foreach (var book in books)
+                {
+                    DataRow row = dt.NewRow();
+                    row.ItemArray = new object[] { counter, i + 1, book.Title };
+                    dt.Rows.Add(row);
+                    counter++;
+                }
+            }
+            return dt;
+        }
 
         public DataTable BuildDataTableAuthors(int from, int count, List<string> firstnames, List<string> surnames, List<string> words)
         {
@@ -322,42 +322,40 @@ namespace ThinkBooksWebsite.Services
         }
 
         // To stop similar random numbers use the same Random instance
-        private static Random rnd;
-        public static Random GetRandom()
+        static Random rnd;
+        static Random GetRandom()
         {
             if (rnd != null) return rnd;
             rnd = new Random();
             return rnd;
         }
 
+        public List<Book> MakeRandomNumberOfBooks(List<string> words)
+        {
+            var books = new List<Book>();
+            for (int j = 0; j < GetRandom().Next(1, 5); j++)
+            {
+                Book book = GetBookTitle(words);
+                books.Add(book);
+            }
+            return books;
+        }
 
+        public Book GetBookTitle(List<string> words)
+        {
+            var r = GetRandom();
+            int firstWordIndex = r.Next(words.Count);
+            string firstWord = words[firstWordIndex].CapitaliseFirstLetter();
 
-        //public List<Book> MakeRandomNumberOfBooks(List<string> words)
-        //{
-        //    var books = new List<Book>();
-        //    for (int j = 0; j < Util.GetRandom().Next(1, 5); j++)
-        //    {
-        //        Book book = GetBookTitle(words);
-        //        books.Add(book);
-        //    }
-        //    return books;
-        //}
+            // unless want to run out of words!
+            //words.RemoveAt(firstWordIndex);
 
-        //public Book GetBookTitle(List<string> words)
-        //{
-        //    var r = Util.GetRandom();
-        //    int firstWordIndex = r.Next(words.Count);
-        //    string firstWord = words[firstWordIndex].CapitaliseFirstLetter();
+            int secondWordIndex = r.Next(words.Count);
+            string secondWord = words[secondWordIndex].CapitaliseFirstLetter();
 
-        //    // unless want to run out of words!
-        //    //words.RemoveAt(firstWordIndex);
-
-        //    int secondWordIndex = r.Next(words.Count);
-        //    string secondWord = words[secondWordIndex].CapitaliseFirstLetter();
-
-        //    var book = new Book { Title = firstWord + " of the " + secondWord };
-        //    return book; //xx
-        //}
+            var book = new Book { Title = firstWord + " of the " + secondWord };
+            return book;
+        }
 
     }
 }

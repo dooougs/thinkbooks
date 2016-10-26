@@ -1,10 +1,13 @@
 ﻿@model IEnumerable<ThinkBooksWebsite.Models.Book>
 
-<p>
+@*<p>
     @Html.ActionLink("Create New", "Create")
-</p>
+</p>*@
 <table class="table">
     <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.BookID)
+        </th>
         <th>
             @Html.DisplayNameFor(model => model.AuthorID)
         </th>
@@ -17,16 +20,19 @@
 @foreach (var item in Model) {
     <tr>
         <td>
+            @Html.DisplayFor(modelItem => item.BookID)
+        </td>
+        <td>
             @Html.DisplayFor(modelItem => item.AuthorID)
         </td>
         <td>
             @Html.DisplayFor(modelItem => item.Title)
         </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.BookID }) |
-            @Html.ActionLink("Details", "Details", new { id=item.BookID }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.BookID })
-        </td>
+        @*<td>
+            @Html.ActionLink("Edit", "Edit", new {id = item.BookID}) |
+            @Html.ActionLink("Details", "Details", new {id = item.BookID}) |
+            @Html.ActionLink("Delete", "Delete", new {id = item.BookID})
+        </td>*@
     </tr>
 }
 

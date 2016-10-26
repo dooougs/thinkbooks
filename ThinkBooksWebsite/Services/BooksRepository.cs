@@ -39,7 +39,7 @@ namespace ThinkBooksWebsite.Services
                 //var sanitizedSortColumn = commandBuilder.QuoteIdentifier(sortColumn);
 
                 //var offset = (currentPage - 1) * numberOfResults;
-                var sql = "SELECT * FROM Book";
+                var sql = "SELECT top 10 * FROM Book";
                 //var sql = @"
                 //    SELECT * FROM Author 
                 //    WHERE (@AuthorID IS NULL OR AuthorID = @AuthorID)
