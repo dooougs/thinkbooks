@@ -7,6 +7,14 @@
     <title>@ViewBag.Title - My ASP.NET Application</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
+    @*@Scripts.Render("~/Scripts/jquery-1.10.2.min.js")*@
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryui")
+
+    @Styles.Render("~/Content/themes/base/css")
+    @Styles.Render("~/Content/bootstrap.min.css")
+    
+    <link rel="stylesheet" href="~/Content/themes/base/jquery-ui.css"/>
 
 </head>
 <body>
@@ -42,7 +50,7 @@
     </footer>
 </div>
 
-@Scripts.Render("~/bundles/jquery")
+@*@Scripts.Render("~/bundles/jquery")*@
 @Scripts.Render("~/bundles/bootstrap")
 @RenderSection("scripts", required: false)
 @MiniProfiler.RenderIncludes(position:RenderPosition.Left, startHidden:false)

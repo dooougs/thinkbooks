@@ -1,15 +1,7 @@
 ﻿using Dapper;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.Common;
-using System.Data.SqlClient;
 using System.Linq;
 using ThinkBooksWebsite.Models;
-using System;
-using System.Configuration;
-using System.IO;
-using System.Web.Hosting;
-using Microsoft.Ajax.Utilities;
 
 namespace ThinkBooksWebsite.Services
 {

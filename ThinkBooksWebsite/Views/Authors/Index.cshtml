@@ -6,7 +6,7 @@
 </p>*@
 <p>&nbsp;</p>
 
-<form method="get">
+<form id="form1" method="get">
     
     <label>AuthorID</label>
     <input type="text" size="5" name="authorIDFilter" id="authorIDFilter" value="@ViewBag.AuthorIDFilter" />
@@ -15,7 +15,7 @@
     <label>LastName</label>
     <input type="text" name="lastNameFilter" id="lastNameFilter" value="@ViewBag.LastNameFilter" />
     <label>DateOfBirth</label>
-    <input type="date" name="dateOfBirthFilter" id="dateOfBirthFilter" value="@ViewBag.DateOfBirthFilter" />
+    <input type="text" name="dateOfBirthFilter" id="dateOfBirthFilter" value="@ViewBag.DateOfBirthFilter" />
     <label>Results</label>
     <select name="results" id="results">
         <option value="20" @Util.SetSelected(ViewBag.Results, "20")>20</option>
@@ -32,11 +32,11 @@
     @*<span class="PageCount">PageCount: @ViewBag.PageCount</span>*@
     <br />
     <!-- need to store current page if sort button is pressed-->
-    <input type="hidden" name="currentPage" value="@ViewBag.CurrentPage"/>
+    <input type="hidden" name="currentPage" id="currentPage" value="@ViewBag.CurrentPage"/>
     @*<span>currentPage: @ViewBag.CurrentPage</span>*@
     <span>Page @ViewBag.CurrentPage of @ViewBag.PageCount</span>
     <!-- need to stored current sort if next or previous button pressed-->
-    @*<input type="hidden" name="currentSortOrder" value="@ViewBag.CurrentSortOrder" />*@
+    <input type="hidden" name="currentSortOrder" id="currentSortOrder" value="@ViewBag.CurrentSortOrder" />
     @*<span>currentSortOrder: @ViewBag.CurrentSortOrder</span>*@
 
     <button type="submit" name="page" id="previousPage" value="@ViewBag.PreviousPage">Previous Page</button> || 
@@ -77,3 +77,52 @@
 
     </table>
 </form>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        // Changing the sort order, therefore don't need the curentSortOrder in query string
+        $("#sortColumnAuthorID").click(function () {
+            $("#currentSortOrder").prop('disabled', true);
+        });
+
+        $("#sortColumnFirstName").click(function () {
+            $("#currentSortOrder").prop('disabled', true);
+        });
+
+        $("#sortColumnLastName").click(function () {
+            $("#currentSortOrder").prop('disabled', true);
+        });
+
+        $("#sortColumnDateOfBirth").click(function () {
+            $("#currentSortOrder").prop('disabled', true);
+        });
+       
+
+        // As IE11 doesn't support input type="date" use jqueryui datepicker
+        $("#dateOfBirthFilter").datepicker({
+            //dateFormat: "dd-mm-yy",
+            dateFormat: "yy-mm-dd",
+            showAnim: ""
+        });
+
+        // Stop all elements being submitted in get request, so url is cleaner
+        $("#form1").submit(function () {
+            if ($("#authorIDFilter").val() == "") $("#authorIDFilter").prop('disabled', true);
+            if ($("#firstNameFilter").val() == "") $("#firstNameFilter").prop('disabled', true);
+            if ($("#lastNameFilter").val() == "") $("#lastNameFilter").prop('disabled', true);
+            if ($("#dateOfBirthFilter").val() == "") $("#dateOfBirthFilter").prop('disabled', true);
+
+            if ($("#results").val() == "50") $("#results").prop('disabled', true);
+
+            // defaults in the controller so don't need to send
+            if ($("#currentSortOrder").val() == "AuthorID") $("#currentSortOrder").prop('disabled', true);
+
+            // if page is something (ie previous or next has been pressed), we don't need to pass currentPage
+            if ($("#nextPage").val() != "") $("#currentPage").prop('disabled', true);
+            if ($("#previousPage").val() != "") $("#currentPage").prop('disabled', true);
+
+
+            //window.alert("alert" + $("#minDate").val());
+        });
+    });
+</script>
