@@ -9,37 +9,39 @@
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.FirstName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.LastName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.DateOfBirth)
-        </th>
-        <th></th>
-    </tr>
+<form id="form1" method="get">
+    <table class="table">
+        <tr>
+            <th><button type="submit" name="sortColumnAndDirection" id="sortColumnAuthorID" value="@ViewBag.SortParamAuthorID">AuthorID</button></th>
+            <th><button type="submit" name="sortColumnAndDirection" id="sortColumnFirstName" value="@ViewBag.SortParamFirstName">First Name</button></th>
+            <th><button type="submit" name="sortColumnAndDirection" id="sortColumnLastName" value="@ViewBag.SortParamLastName">Last Name</button></th>
+            <th><button type="submit" name="sortColumnAndDirection" id="sortColumnDateOfBirth" value="@ViewBag.SortParamDateOfBirth">Date Of Birth</button></th>
+            <th></th>
+        </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.FirstName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.LastName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.DateOfBirth)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.AuthorID }) |
-            @Html.ActionLink("Details", "Details", new { id=item.AuthorID }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.AuthorID })
-        </td>
-    </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AuthorID)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FirstName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastName)
+                </td>
+                <td>
+                    @*@item.DateOfBirth.ToShortDateString()*@
+                    @*@Html.DisplayFor(modelItem => item.DateOfBirth)*@
+                </td>
+                @*<td>
+                        @Html.ActionLink("Edit", "Edit", new {id = item.AuthorID}) |
+                        @Html.ActionLink("Details", "Details", new {id = item.AuthorID}) |
+                        @Html.ActionLink("Delete", "Delete", new {id = item.AuthorID})
+                    </td>*@
+            </tr>
+        }
 
-</table>
+    </table>
+</form>

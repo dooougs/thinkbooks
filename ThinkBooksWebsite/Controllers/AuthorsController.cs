@@ -16,8 +16,6 @@ namespace ThinkBooksWebsite.Controllers
         public ActionResult Index(string sortColumnAndDirection = "AuthorID", string currentSortOrder = "AuthorID", int page = 1, int currentPage = 1, int? authorIDFilter = null, string firstNameFilter = null, 
             string lastNameFilter = null, DateTime? dateOfBirthFilter = null, string results = "50")
         {
-            var profiler = MiniProfiler.Current; // it's ok if this is null
-
             // clicked on next or previous button, so keep the sortOrder. 
             // unless page == 1, which means a sort button has been pressed
             if (page != currentPage && page != 1)

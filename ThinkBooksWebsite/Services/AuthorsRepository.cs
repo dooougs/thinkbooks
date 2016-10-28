@@ -231,10 +231,10 @@ namespace ThinkBooksWebsite.Services
                 }
             }
 
-            //using (var c = Util.GetOpenConnection())
-            //{
-            //    c.Execute("ALTER TABLE[dbo].[Books] WITH CHECK ADD CONSTRAINT[FK_Books_ToAuthor] FOREIGN KEY([AuthorID]) REFERENCES[dbo].[Authors]([AuthorID])");
-            //}
+            using (var c = Util.GetOpenConnection())
+            {
+                c.Execute("ALTER TABLE[dbo].[Book] WITH CHECK ADD CONSTRAINT[FK_Book_Author] FOREIGN KEY([AuthorID]) REFERENCES[dbo].[Author]([AuthorID])");
+            }
         }
 
         private static List<string> LoadWords()
