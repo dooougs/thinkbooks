@@ -17,6 +17,6 @@ namespace ThinkBooksWebsiteEF.Models
         public int AuthorID { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public Nullable<System.DateTime> DateOfBirth { get; set; }
+        public System.DateTime DateOfBirth { get; set; }
     }
 }

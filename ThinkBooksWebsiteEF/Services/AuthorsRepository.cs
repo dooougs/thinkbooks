@@ -61,7 +61,7 @@ namespace ThinkBooksWebsiteEF.Services
 
             // System.Linq.Dynamic to be able to sort on column - sanitizedSortColumn
             //var result = db.Authors.Take(20).OrderBy(x => x.AuthorID).ToList();
-            var result = db.Authors.Take(20).OrderBy(sortColumn).ToList();
+            List<Author> result = db.Authors.Take(20).OrderBy(sortColumn).ToList();
             //var result = db.Authors.Take(20).OrderBy("AuthorID").ToList();
 
 
