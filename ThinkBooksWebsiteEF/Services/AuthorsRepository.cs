@@ -61,42 +61,50 @@ namespace ThinkBooksWebsiteEF.Services
 
             // System.Linq.Dynamic to be able to sort on column - sanitizedSortColumn
             //var result = db.Authors.Take(20).OrderBy(x => x.AuthorID).ToList();
+            if (sortDirection == "DESC")
+                sortColumn += " descending";
+
+            // okay http://stackoverflow.com/questions/7767409/better-way-to-query-a-page-of-data-and-get-total-count-in-entity-framework-4-1/7771298#7771298
+            // stopping with more complex EF queries - sweet spot is CRUD simple?
+            // feels like unnecessary abstraction
             List<Author> result = db.Authors.Take(20).OrderBy(sortColumn).ToList();
-            //var result = db.Authors.Take(20).OrderBy("AuthorID").ToList();
+
+            // how about simple CRUD to stored procs with EF?
 
 
 
-            // seems super fast doing 2 queries ie don't need to do return multiple record sets
-            //string sqlCount;
-            //if (authorIDFilter == null && dateOfBirthFilter == null && firstNameFilter.IsNullOrWhiteSpace() && lastNameFilter.IsNullOrWhiteSpace())
-            //{
-            //    sqlCount = @"SELECT SUM(p.rows)
-            //              FROM sys.partitions AS p
-            //              INNER JOIN sys.tables AS t
-            //              ON p.[object_id] = t.[object_id]
-            //              INNER JOIN sys.schemas AS s
-            //              ON t.[schema_id] = s.[schema_id]
-            //              WHERE p.index_id IN (0,1) -- heap or clustered index
-            //              AND t.name = N'Author'
-            //              AND s.name = N'dbo'";
-            //}
-            //else
-            //{
-            //    sqlCount = @"SELECT COUNT(*) FROM Author
-            //                    WHERE(@AuthorID IS NULL OR AuthorID = @AuthorID)
-            //                    AND(@firstName IS NULL OR FirstName LIKE CONCAT(@firstName, '%'))
-            //                    AND (@LastName IS NULL OR LastName LIKE CONCAT(@LastName,'%'))
-            //                    AND(@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)";
-            //}
-            //var count = db.Query<int>(sqlCount, new
-            //{
-            //    authorID = authorIDFilter,
-            //    firstName = firstNameFilter,
-            //    lastName = lastNameFilter,
-            //    dateOfBirth = dateOfBirthFilter
-            //}).Single();
 
-            var vm = new AuthorsViewModel
+                    // seems super fast doing 2 queries ie don't need to do return multiple record sets
+                    //string sqlCount;
+                    //if (authorIDFilter == null && dateOfBirthFilter == null && firstNameFilter.IsNullOrWhiteSpace() && lastNameFilter.IsNullOrWhiteSpace())
+                    //{
+                    //    sqlCount = @"SELECT SUM(p.rows)
+                    //              FROM sys.partitions AS p
+                    //              INNER JOIN sys.tables AS t
+                    //              ON p.[object_id] = t.[object_id]
+                    //              INNER JOIN sys.schemas AS s
+                    //              ON t.[schema_id] = s.[schema_id]
+                    //              WHERE p.index_id IN (0,1) -- heap or clustered index
+                    //              AND t.name = N'Author'
+                    //              AND s.name = N'dbo'";
+                    //}
+                    //else
+                    //{
+                    //    sqlCount = @"SELECT COUNT(*) FROM Author
+                    //                    WHERE(@AuthorID IS NULL OR AuthorID = @AuthorID)
+                    //                    AND(@firstName IS NULL OR FirstName LIKE CONCAT(@firstName, '%'))
+                    //                    AND (@LastName IS NULL OR LastName LIKE CONCAT(@LastName,'%'))
+                    //                    AND(@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)";
+                    //}
+                    //var count = db.Query<int>(sqlCount, new
+                    //{
+                    //    authorID = authorIDFilter,
+                    //    firstName = firstNameFilter,
+                    //    lastName = lastNameFilter,
+                    //    dateOfBirth = dateOfBirthFilter
+                    //}).Single();
+
+                    var vm = new AuthorsViewModel
             {
                 Authors = result,
                 CountOfAuthors = 0
