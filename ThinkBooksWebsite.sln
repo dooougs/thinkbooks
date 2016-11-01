@@ -9,6 +9,8 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "ThinkBooksDB", "ThinkBooksD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThinkBooksWebsiteEF", "ThinkBooksWebsiteEF\ThinkBooksWebsiteEF.csproj", "{2AD3A50A-8154-4557-925F-A7E921E16A93}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThinkBooksWebsiteEF2", "ThinkBooksWebsiteEF2\ThinkBooksWebsiteEF2.csproj", "{9DA142A9-5F55-4F10-9954-5B6F02823C26}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{2AD3A50A-8154-4557-925F-A7E921E16A93}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2AD3A50A-8154-4557-925F-A7E921E16A93}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2AD3A50A-8154-4557-925F-A7E921E16A93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DA142A9-5F55-4F10-9954-5B6F02823C26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DA142A9-5F55-4F10-9954-5B6F02823C26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DA142A9-5F55-4F10-9954-5B6F02823C26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DA142A9-5F55-4F10-9954-5B6F02823C26}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
