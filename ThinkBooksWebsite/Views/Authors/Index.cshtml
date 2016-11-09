@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ThinkBooksWebsiteEF.Models.Author>
+﻿@model IEnumerable<ThinkBooksWebsite.Models.Author>
 @using ThinkBooksWebsite.Services.HtmlHelper
 
 @*<p>
@@ -7,7 +7,6 @@
 <p>&nbsp;</p>
 
 <form id="form1" method="get">
-
     <label>AuthorID</label>
     <input type="text" size="5" name="authorIDFilter" id="authorIDFilter" value="@ViewBag.AuthorIDFilter" />
     <label>FirstName</label>
@@ -47,6 +46,7 @@
     <table class="table">
         <tr>
             <th><button type="submit" name="sortColumnAndDirection" id="sortColumnAuthorID" value="@ViewBag.SortParamAuthorID">AuthorID</button></th>
+            <th><button type="submit" name="sortColumnAndDirection" id="sortColumnAuthorIDx">AuthorStatus</button></th>
             <th><button type="submit" name="sortColumnAndDirection" id="sortColumnFirstName" value="@ViewBag.SortParamFirstName">First Name</button></th>
             <th><button type="submit" name="sortColumnAndDirection" id="sortColumnLastName" value="@ViewBag.SortParamLastName">Last Name</button></th>
             <th><button type="submit" name="sortColumnAndDirection" id="sortColumnDateOfBirth" value="@ViewBag.SortParamDateOfBirth">Date Of Birth</button></th>
@@ -60,6 +60,9 @@
                     @Html.DisplayFor(modelItem => item.AuthorID)
                 </td>
                 <td>
+                    @Html.DisplayFor(modelItem => item.AuthorStatusName)
+                </td>
+                <td>
                     @Html.DisplayFor(modelItem => item.FirstName)
                 </td>
                 <td>
@@ -67,14 +70,14 @@
                 </td>
                 <td>
                     @item.DateOfBirth.ToShortDateString()
-                @*@Html.DisplayFor(modelItem => item.DateOfBirth)*@
-            </td>
-            @*<td>
-                    @Html.ActionLink("Edit", "Edit", new {id = item.AuthorID}) |
-                    @Html.ActionLink("Details", "Details", new {id = item.AuthorID}) |
-                    @Html.ActionLink("Delete", "Delete", new {id = item.AuthorID})
-                </td>*@
-        </tr>
+                    @*@Html.DisplayFor(modelItem => item.DateOfBirth)*@
+                </td>
+                @*<td>
+                        @Html.ActionLink("Edit", "Edit", new {id = item.AuthorID}) |
+                        @Html.ActionLink("Details", "Details", new {id = item.AuthorID}) |
+                        @Html.ActionLink("Delete", "Delete", new {id = item.AuthorID})
+                    </td>*@
+            </tr>
         }
 
     </table>
