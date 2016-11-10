@@ -109,23 +109,26 @@ namespace ThinkBooksWebsite.Services
                 //SQL2012 ORDER BY OFFSET FETCH
                 //AND(@FirstName IS NULL OR FirstName LIKE CONCAT('%', @FirstName, '%'))
                 //AND(@LastName IS NULL OR LastName LIKE '%' + @LastName + '%')
-                var offset = (currentPage - 1)*numberOfResults;
+                var offset = (currentPage - 1) * numberOfResults;
 
                 // the MVC mapper will map an empty string from the firstName and lastName form post to an empty string
                 // we depend on nulls in the SQL.  Int and DateTime are okay.
                 if (firstNameFilter == "") firstNameFilter = null;
                 if (lastNameFilter == "") lastNameFilter = null;
 
+                //AND(@LastName IS NULL OR LastName LIKE CONCAT(@LastName, '%'))
+
                 // note % preceding a like search is much slower (250ms to 65ms) and seems a rarer business case to do that
                 var sql = @"
-                    SELECT * FROM Author 
-                    WHERE (@AuthorID IS NULL OR AuthorID = @AuthorID)
-                    AND (@FirstName IS NULL OR FirstName LIKE CONCAT(@FirstName,'%'))
-                    AND (@LastName IS NULL OR LastName LIKE CONCAT(@LastName,'%'))
-                    AND (@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)
-                    ORDER BY " + sanitizedSortColumn + " " + sortDirection + @"
-                    OFFSET "+ offset + @" ROWS 
-                    FETCH NEXT " + numberOfResults + " ROWS ONLY";
+                        SELECT a.*, s.Name AS AuthorStatusName FROM Author a
+                        INNER JOIN AuthorStatus s ON a.AuthorStatusID = s.AuthorStatusID
+                        WHERE (@AuthorID IS NULL OR AuthorID = @AuthorID)
+                        AND (@FirstName IS NULL OR FirstName LIKE CONCAT(@FirstName,'%'))
+                        AND (@LastName IS NULL OR LastName LIKE CONCAT(@LastName,'%'))
+                        AND (@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)
+                        ORDER BY " + sanitizedSortColumn + " " + sortDirection + @"
+                        OFFSET " + offset + @" ROWS 
+                        FETCH NEXT " + numberOfResults + " ROWS ONLY";
 
                 var result = db.Query<Author>(sql,
                          new
@@ -137,6 +140,15 @@ namespace ThinkBooksWebsite.Services
                              numberOfResults,
                              PageNumber = currentPage
                          }).ToList();
+
+
+                // horrible way of getting the AuthorStatus eg Alive or Dead
+                //foreach (var author in result)
+                //{
+                //    var authorStatusName = db.Query<string>("SELECT Name from AuthorStatus WHERE AuthorStatusID = @AuthorStatusID",
+                //        new {author.AuthorStatusID}).FirstOrDefault();
+                //    author.AuthorStatusName = authorStatusName;
+                //}
 
                 // seems super fast doing 2 queries ie don't need to do return multiple record sets
                 string sqlCount;
@@ -157,7 +169,7 @@ namespace ThinkBooksWebsite.Services
                     sqlCount = @"SELECT COUNT(*) FROM Author
                                 WHERE(@AuthorID IS NULL OR AuthorID = @AuthorID)
                                 AND(@firstName IS NULL OR FirstName LIKE CONCAT(@firstName, '%'))
-                                AND (@LastName IS NULL OR LastName LIKE CONCAT(@LastName,'%'))
+                                AND(@LastName IS NULL OR LastName LIKE CONCAT(@LastName,'%'))
                                 AND(@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)";
                 }
                 var count = db.Query<int>(sqlCount, new
@@ -193,6 +205,17 @@ namespace ThinkBooksWebsite.Services
             var numberOfBatches = 25;
 
             TruncateTables();
+
+            // Add AuthorStatus table
+            using (var c = Util.GetOpenConnection())
+            {
+                var sql = @"SET IDENTITY_INSERT [dbo].[AuthorStatus] ON 
+                            INSERT [dbo].[AuthorStatus] ([AuthorStatusID], [Name]) VALUES (1, N'Alive')
+                            INSERT [dbo].[AuthorStatus] ([AuthorStatusID], [Name]) VALUES (2, N'Dead')
+                            SET IDENTITY_INSERT [dbo].[AuthorStatus] OFF";
+                c.Execute(sql);
+            }
+
 
             var firstnames = LoadFirstNames();
             var surnames = LoadSurnames();
@@ -234,6 +257,7 @@ namespace ThinkBooksWebsite.Services
             using (var c = Util.GetOpenConnection())
             {
                 c.Execute("ALTER TABLE[dbo].[Book] WITH CHECK ADD CONSTRAINT[FK_Book_Author] FOREIGN KEY([AuthorID]) REFERENCES[dbo].[Author]([AuthorID])");
+                c.Execute("ALTER TABLE[dbo].[Author] WITH CHECK ADD CONSTRAINT[FK_Author_AuthorStatus] FOREIGN KEY([AuthorStatusID]) REFERENCES[dbo].[AuthorStatus]([AuthorStatusID])");
             }
         }
 
@@ -265,11 +289,13 @@ namespace ThinkBooksWebsite.Services
                 try
                 {
                     c.Execute("ALTER TABLE [dbo].[Book] DROP CONSTRAINT [FK_Book_Author]");
+                    c.Execute("ALTER TABLE [dbo].[Author] DROP CONSTRAINT [FK_Author_AuthorStatus]");
                 }
-                catch{}
+                catch { }
 
                 c.Execute("TRUNCATE TABLE Author;");
                 c.Execute("TRUNCATE TABLE Book;");
+                c.Execute("TRUNCATE TABLE AuthorStatus;");
             }
         }
 
@@ -279,7 +305,7 @@ namespace ThinkBooksWebsite.Services
             dt.Columns.Add("BookID", typeof(int));
             dt.Columns.Add("AuthorID", typeof(int));
             dt.Columns.Add("Title", typeof(string));
-            
+
             int counter = 1;
             for (int i = from; i < from + count; i++)
             {
@@ -299,18 +325,20 @@ namespace ThinkBooksWebsite.Services
         {
             var dt = new DataTable();
             dt.Columns.Add("AuthorID", typeof(int));
+            dt.Columns.Add("AuthorStatusID", typeof(int));
             dt.Columns.Add("FirstName", typeof(string));
             dt.Columns.Add("LastName", typeof(string));
             dt.Columns.Add("DateOfBirth", typeof(DateTime));
             //dt.Columns.Add("EmailAddress", typeof(string));
 
+            var r = GetRandom();
             for (int i = from; i < from + count; i++)
             {
                 Author author = MakeRandomAuthor(firstnames, surnames);
                 DataRow row = dt.NewRow();
                 // this looks like AuthorID initially will be 0, however it is 1 (identity).. so its just a key for the dt?
                 //row.ItemArray = new object[] { i, author.FirstName, author.LastName, author.EmailAddress };
-                row.ItemArray = new object[] { i, author.FirstName, author.LastName, author.DateOfBirth };
+                row.ItemArray = new object[] { i, r.Next(1,3), author.FirstName, author.LastName, author.DateOfBirth };
                 dt.Rows.Add(row);
             }
             return dt;

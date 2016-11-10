@@ -44,6 +44,8 @@ namespace ThinkBooksWebsite.Controllers
             List<Author> authors = vm.Authors;
             ViewBag.TotalQueryCountOfAuthors = vm.CountOfAuthors;
 
+      
+
             // Flip the order of the sort param on the button so next time it is pressed with reverse current
             ViewBag.SortParamAuthorID = sortColumnAndDirection == "AuthorID" ? "AuthorID_desc" : "AuthorID";
             ViewBag.SortParamFirstName = sortColumnAndDirection == "FirstName" ? "FirstName_desc" : "FirstName";
