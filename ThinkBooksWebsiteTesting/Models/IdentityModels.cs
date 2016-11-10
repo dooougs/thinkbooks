@@ -29,5 +29,7 @@ namespace ThinkBooksWebsiteTesting.Models
         {
             return new ApplicationDbContext();
         }
+
+        public System.Data.Entity.DbSet<ThinkBooksWebsiteTesting.Models.BookStatus> BookStatus { get; set; }
     }
 }
