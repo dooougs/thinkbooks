@@ -44,13 +44,12 @@ namespace ThinkBooksWebsite.Controllers
             List<Author> authors = vm.Authors;
             ViewBag.TotalQueryCountOfAuthors = vm.CountOfAuthors;
 
-      
-
-            // Flip the order of the sort param on the button so next time it is pressed with reverse current
+            // Flip the order of the sort param on the button so next time it is pressed it will reverse
             ViewBag.SortParamAuthorID = sortColumnAndDirection == "AuthorID" ? "AuthorID_desc" : "AuthorID";
             ViewBag.SortParamFirstName = sortColumnAndDirection == "FirstName" ? "FirstName_desc" : "FirstName";
             ViewBag.SortParamLastName = sortColumnAndDirection == "LastName" ? "LastName_desc" : "LastName";
             ViewBag.SortParamDateOfBirth = sortColumnAndDirection == "DateOfBirth" ? "DateOfBirth_desc" : "DateOfBirth";
+            ViewBag.SortParamAuthorStatus = sortColumnAndDirection == "AuthorStatus" ? "AuthorStatus_desc" : "AuthorStatus";
 
             // Keep filters sticky
             ViewBag.AuthorIDFilter = authorIDFilter;
@@ -62,10 +61,10 @@ namespace ThinkBooksWebsite.Controllers
                 ViewBag.DateOfBirthFilter = Convert.ToDateTime(dateOfBirthFilter).ToString("yyyy-MM-dd");
             }
 
-            // Keep number of results sticky
+            // Keep number of results drop down sticky
             ViewBag.Results = results;
 
-            // paging
+            // Paging
             var records = vm.CountOfAuthors;
             var recordsPerPage =  int.Parse(results);
             int pageCount = (records + recordsPerPage - 1) / recordsPerPage;

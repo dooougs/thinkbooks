@@ -1,10 +1,7 @@
 ﻿@model IEnumerable<ThinkBooksWebsite.Models.Author>
 @using ThinkBooksWebsite.Services.HtmlHelper
 
-@*<p>
-        @Html.ActionLink("Create New", "Create")
-    </p>*@
-<p>&nbsp;</p>
+<br />
 
 <form id="form1" method="get">
     <label>AuthorID</label>
@@ -39,14 +36,13 @@
     @*<span>currentSortOrder: @ViewBag.CurrentSortOrder</span>*@
 
     <button type="submit" name="page" id="previousPage" value="@ViewBag.PreviousPage">Previous Page</button> ||
-
     <button type="submit" name="page" id="nextPage" value="@ViewBag.NextPage">Next Page</button>
 
     <br />
     <table class="table">
         <tr>
             <th><button type="submit" name="sortColumnAndDirection" id="sortColumnAuthorID" value="@ViewBag.SortParamAuthorID">AuthorID</button></th>
-            <th><button type="submit" name="sortColumnAndDirection" id="sortColumnAuthorIDx">AuthorStatus</button></th>
+            <th><button type="submit" name="sortColumnAndDirection" id="sortColumnAuthorStatus" value="@ViewBag.SortParamAuthorStatus">AuthorStatus</button></th>
             <th><button type="submit" name="sortColumnAndDirection" id="sortColumnFirstName" value="@ViewBag.SortParamFirstName">First Name</button></th>
             <th><button type="submit" name="sortColumnAndDirection" id="sortColumnLastName" value="@ViewBag.SortParamLastName">Last Name</button></th>
             <th><button type="submit" name="sortColumnAndDirection" id="sortColumnDateOfBirth" value="@ViewBag.SortParamDateOfBirth">Date Of Birth</button></th>
@@ -106,7 +102,6 @@
         $("#sortColumnDateOfBirth").click(function () {
             $("#currentSortOrder").prop('disabled', true);
         });
-
 
         // As IE11 doesn't support input type="date" use jqueryui datepicker
         $("#dateOfBirthFilter").datepicker({

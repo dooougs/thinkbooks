@@ -1,15 +1,14 @@
 ﻿using Dapper;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Common;
-using System.Data.SqlClient;
-using System.Linq;
-using ThinkBooksWebsite.Models;
-using System;
-using System.Configuration;
-using System.IO;
-using System.Web.Hosting;
 using Microsoft.Ajax.Utilities;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
+using System.IO;
+using System.Linq;
+using System.Web.Hosting;
+using ThinkBooksWebsite.Models;
 
 namespace ThinkBooksWebsite.Services
 {
@@ -21,53 +20,6 @@ namespace ThinkBooksWebsite.Services
 
     public class AuthorsRepository
     {
-        // Stored Proc
-        public AuthorsViewModel GetAuthors2(string sortColumnAndDirection, int? authorIDFilter,
-            string firstNameFilter, string lastNameFilter, DateTime? dateOfBirthFilter, int numberOfResults)
-        {
-            using (var db = Util.GetOpenConnection())
-            {
-                var p = new DynamicParameters();
-                var sortDirection = "ASC";
-                var sortColumn = sortColumnAndDirection;
-                if (sortColumnAndDirection.EndsWith("_desc"))
-                {
-                    sortDirection = "DESC";
-                    sortColumn = sortColumn.Substring(0, sortColumnAndDirection.Length - 5);
-                }
-
-                p.Add("@SortColumn", sortColumn);
-                p.Add("@SortDirection", sortDirection);
-
-                p.Add("@AuthorID", authorIDFilter);
-                if (firstNameFilter == "")
-                    p.Add("@FirstName");
-                else
-                    p.Add("@FirstName", firstNameFilter);
-
-                if (lastNameFilter == "")
-                    p.Add("@LastName");
-                else
-                    p.Add("@LastName", lastNameFilter);
-
-                p.Add("@DateOfBirth", dateOfBirthFilter);
-                p.Add("@NumberOfResults", numberOfResults);
-                p.Add("@PageNumber", 2);
-
-                // keep the main query, and count logic in 1 SP which returns 2 record sets (the results, and a single row - count)
-                var x = db.QueryMultiple("GetAuthors", p, commandType: CommandType.StoredProcedure);
-                var result = x.Read<Author>().ToList();
-                var count = x.Read<int>().Single();
-                var vm = new AuthorsViewModel
-                {
-                    Authors = result,
-                    CountOfAuthors = count
-                };
-                return vm;
-            }
-        }
-
-        // Using inline SQL
         public AuthorsViewModel GetAuthors(string sortColumnAndDirection, int? authorIDFilter,
             string firstNameFilter, string lastNameFilter, DateTime? dateOfBirthFilter, int numberOfResults, int currentPage)
         {
@@ -83,32 +35,7 @@ namespace ThinkBooksWebsite.Services
 
                 var commandBuilder = new SqlCommandBuilder();
                 var sanitizedSortColumn = commandBuilder.QuoteIdentifier(sortColumn);
-
-                //var sql = @"
-                //    SELECT TOP (@NumberOfResults) * FROM Author 
-                //    WHERE (@AuthorID IS NULL OR AuthorID = @AuthorID)
-                //    AND (@FirstName IS NULL OR FirstName LIKE CONCAT('%',@FirstName,'%'))
-                // AND (@LastName IS NULL OR LastName LIKE '%'+@LastName+'%')
-                // AND (@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)
-                //    ORDER BY " + sanitizedSortColumn + " " + sortDirection;
-
-                // CTE (SQL2005) paging testing
-                //var sql = @"WITH ctepaging
-                // AS (
-                // SELECT *,Row_number() OVER (ORDER BY " + sanitizedSortColumn + " " + sortDirection + @") AS rownum
-                // FROM Author
-                // WHERE (@AuthorID IS NULL OR AuthorID = @AuthorID)
-                // AND (@FirstName IS NULL OR FirstName LIKE CONCAT('%',@FirstName,'%'))
-                // AND (@LastName IS NULL OR LastName LIKE '%'+@LastName+'%')
-                // AND (@DateOfBirth IS NULL OR DateOfBirth = @DateOfBirth)
-                // )
-                //SELECT *
-                //FROM ctepaging
-                //WHERE rownum BETWEEN (@PageNumber-1) * @NumberOfResults+1  AND @PageNumber * @NumberOfResults";
-
-                //SQL2012 ORDER BY OFFSET FETCH
-                //AND(@FirstName IS NULL OR FirstName LIKE CONCAT('%', @FirstName, '%'))
-                //AND(@LastName IS NULL OR LastName LIKE '%' + @LastName + '%')
+               
                 var offset = (currentPage - 1) * numberOfResults;
 
                 // the MVC mapper will map an empty string from the firstName and lastName form post to an empty string
@@ -116,7 +43,7 @@ namespace ThinkBooksWebsite.Services
                 if (firstNameFilter == "") firstNameFilter = null;
                 if (lastNameFilter == "") lastNameFilter = null;
 
-                //AND(@LastName IS NULL OR LastName LIKE CONCAT(@LastName, '%'))
+                if (sanitizedSortColumn == "[AuthorStatus]") sanitizedSortColumn = "[AuthorStatusName]";
 
                 // note % preceding a like search is much slower (250ms to 65ms) and seems a rarer business case to do that
                 var sql = @"
@@ -142,15 +69,7 @@ namespace ThinkBooksWebsite.Services
                          }).ToList();
 
 
-                // horrible way of getting the AuthorStatus eg Alive or Dead
-                //foreach (var author in result)
-                //{
-                //    var authorStatusName = db.Query<string>("SELECT Name from AuthorStatus WHERE AuthorStatusID = @AuthorStatusID",
-                //        new {author.AuthorStatusID}).FirstOrDefault();
-                //    author.AuthorStatusName = authorStatusName;
-                //}
-
-                // seems super fast doing 2 queries ie don't need to do return multiple record sets
+                // super fast doing 2 queries ie don't need to do return multiple record sets
                 string sqlCount;
                 if (authorIDFilter == null && dateOfBirthFilter == null && firstNameFilter.IsNullOrWhiteSpace() && lastNameFilter.IsNullOrWhiteSpace())
                 {
@@ -189,6 +108,8 @@ namespace ThinkBooksWebsite.Services
                 return vm;
             }
         }
+
+       
 
         // {=} is inline value injection, but has to be an int, or enum
         //SELECT TOP {= count} *FROM Author WHERE FirstName LIKE { @firstName} ORDER BY {= sortOrder}
@@ -393,6 +314,52 @@ namespace ThinkBooksWebsite.Services
             var book = new Book { Title = firstWord + " of the " + secondWord };
             return book;
         }
+
+        // Stored Proc
+        //public AuthorsViewModel GetAuthors2(string sortColumnAndDirection, int? authorIDFilter,
+        //    string firstNameFilter, string lastNameFilter, DateTime? dateOfBirthFilter, int numberOfResults)
+        //{
+        //    using (var db = Util.GetOpenConnection())
+        //    {
+        //        var p = new DynamicParameters();
+        //        var sortDirection = "ASC";
+        //        var sortColumn = sortColumnAndDirection;
+        //        if (sortColumnAndDirection.EndsWith("_desc"))
+        //        {
+        //            sortDirection = "DESC";
+        //            sortColumn = sortColumn.Substring(0, sortColumnAndDirection.Length - 5);
+        //        }
+
+        //        p.Add("@SortColumn", sortColumn);
+        //        p.Add("@SortDirection", sortDirection);
+
+        //        p.Add("@AuthorID", authorIDFilter);
+        //        if (firstNameFilter == "")
+        //            p.Add("@FirstName");
+        //        else
+        //            p.Add("@FirstName", firstNameFilter);
+
+        //        if (lastNameFilter == "")
+        //            p.Add("@LastName");
+        //        else
+        //            p.Add("@LastName", lastNameFilter);
+
+        //        p.Add("@DateOfBirth", dateOfBirthFilter);
+        //        p.Add("@NumberOfResults", numberOfResults);
+        //        p.Add("@PageNumber", 2);
+
+        //        // keep the main query, and count logic in 1 SP which returns 2 record sets (the results, and a single row - count)
+        //        var x = db.QueryMultiple("GetAuthors", p, commandType: CommandType.StoredProcedure);
+        //        var result = x.Read<Author>().ToList();
+        //        var count = x.Read<int>().Single();
+        //        var vm = new AuthorsViewModel
+        //        {
+        //            Authors = result,
+        //            CountOfAuthors = count
+        //        };
+        //        return vm;
+        //    }
+        //}
 
     }
 }
