@@ -11,7 +11,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThinkBooksWebsiteEF", "Thin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThinkBooksWebsiteEF2", "ThinkBooksWebsiteEF2\ThinkBooksWebsiteEF2.csproj", "{9DA142A9-5F55-4F10-9954-5B6F02823C26}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThinkBooksWebsiteTesting", "ThinkBooksWebsiteTesting\ThinkBooksWebsiteTesting.csproj", "{F7257626-95DD-41FB-9CC7-F3B55ED8427A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThinkBooksWebsiteTestingDapperContrib", "ThinkBooksWebsiteTesting\ThinkBooksWebsiteTestingDapperContrib.csproj", "{F7257626-95DD-41FB-9CC7-F3B55ED8427A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThinkBooksWebsiteAuthTest", "ThinkBooksWebsiteAuthTest\ThinkBooksWebsiteAuthTest.csproj", "{9BE82277-4C43-484E-B653-C21E90A365A5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,10 @@ Global
 		{F7257626-95DD-41FB-9CC7-F3B55ED8427A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F7257626-95DD-41FB-9CC7-F3B55ED8427A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F7257626-95DD-41FB-9CC7-F3B55ED8427A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BE82277-4C43-484E-B653-C21E90A365A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BE82277-4C43-484E-B653-C21E90A365A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BE82277-4C43-484E-B653-C21E90A365A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BE82277-4C43-484E-B653-C21E90A365A5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

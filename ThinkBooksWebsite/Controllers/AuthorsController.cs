@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web.Mvc;
-using StackExchange.Profiling;
 using ThinkBooksWebsite.Models;
 using ThinkBooksWebsite.Services;
 

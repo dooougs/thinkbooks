@@ -1,0 +1,19 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<br />
+
+<div>This page is open to anyone logged into the Windows AD Domain ie windows auth has to have worked.</div>
+
+<br />
+
+<div><a href="/Home/Abou">/Home/About</a> you need to be in AD Group - QNRL\Administrators</div>
+
+<br />
+<div><a href="/Errors/Unauthorized">/Errors/Unauthorized</a> is the page you are redirected to if unauthorized</div>
+
+<br />
+
+<div>Note: am not sending back an HttpStatusCode of 503 to the browser, as I want a better experience for the user ie a page to tell them what group they need to be in.</div>
+
