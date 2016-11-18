@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System;
+using System.Web.Mvc;
 
 namespace ThinkBooksWebsiteAuthTest.Controllers
 {
@@ -8,6 +9,8 @@ namespace ThinkBooksWebsiteAuthTest.Controllers
         public static string All = "QNRL\\All Quorum";
         public static string Dev = "QNRL\\Developers";
         public static string Admin = "QNRL\\Administrators";
+
+        public static bool AuthOn = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["AuthOn"]);
     }
 
     public class HomeController : Controller
@@ -19,9 +22,10 @@ namespace ThinkBooksWebsiteAuthTest.Controllers
 
         public ActionResult About()
         {
-            // Specifices which roles need to be in to run this method
-            if (User.IsInRole(TR.Dev) || User.IsInRole(TR.Admin)) { }
-            else return RedirectToAction("Unauthorized", "Errors", null);
+            // If Auth is on (in web.config), specifices which roles the user needs to be in to run this method
+            if (TR.AuthOn)
+                if (User.IsInRole(TR.Dev) || User.IsInRole(TR.Admin)) { }
+                else return RedirectToAction("Unauthorized", "Errors", null);
 
             ViewBag.Message = "Your application description page.";
 
@@ -31,8 +35,9 @@ namespace ThinkBooksWebsiteAuthTest.Controllers
         public ActionResult Contact()
         {
             // Specifices which roles need to be in to run this method
-            if (User.IsInRole(TR.Admin)) { }
-            else return RedirectToAction("Unauthorized", "Errors", null);
+            if (TR.AuthOn)
+                if (User.IsInRole(TR.Admin)) { }
+                else return RedirectToAction("Unauthorized", "Errors", null);
 
             ViewBag.Message = "Your contact page.";
 
