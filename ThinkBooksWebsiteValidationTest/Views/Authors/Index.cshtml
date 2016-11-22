@@ -1,51 +1,135 @@
 ﻿@model IEnumerable<ThinkBooksWebsiteValidationTest.Models.Author>
 
-@{
-    ViewBag.Title = "Index";
-}
-
-<h2>Index</h2>
 
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.FirstName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.LastName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.DateOfBirth)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.AuthorStatu.Name)
-        </th>
-        <th></th>
-    </tr>
+<form method="get">
+    <section class="container">
+        <div class="row">
+            @*<div class="col-lg-12">*@
+                <div id="filter-col-1" class="col-lg-4">
+                    <div class="row">
+                        <label>Status</label>
+                        <select name="statusID">
+                            <option>asdf</option>
+                            <option>asdf2</option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <label>Type</label>
+                        <select name="statusID">
+                            <option>asdf</option>
+                            <option>asdf2</option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <label>Person</label>
+                        <select name="statusID">
+                            <option>asdf</option>
+                            <option>asdf2</option>
+                        </select>
+                    </div>
+                </div>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.FirstName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.LastName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.DateOfBirth)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.AuthorStatu.Name)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.AuthorID }) |
-            @Html.ActionLink("Details", "Details", new { id=item.AuthorID }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.AuthorID })
-        </td>
-    </tr>
-}
+                <div id="filter-col-2" class="col-lg-4">
+                    <div class="row">
+                        <label>Status2</label>
+                        <select name="statusID">
+                            <option>asdf</option>
+                            <option>asdf2</option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <label>Type2</label>
+                        <select name="statusID">
+                            <option>asdf</option>
+                            <option>asdf2</option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <label>Person2</label>
+                        <select name="statusID">
+                            <option>asdf</option>
+                            <option>asdf2</option>
+                        </select>
+                    </div>
+                </div>
 
-</table>
+                <div id="filter-col-3" class="col-lg-4">
+                    <div class="row">
+                        <label>Status3</label>
+                        <select name="statusID">
+                            <option>asdf</option>
+                            <option>asdf2</option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <label>Type3</label>
+                        <select name="statusID">
+                            <option>asdf</option>
+                            <option>asdf2</option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <label>Person3</label>
+                        <select name="statusID">
+                            <option>asdf</option>
+                            <option>asdf2</option>
+                        </select>
+                    </div>
+                </div>
+            @*</div>*@
+        </div>
+    </section>
+
+    <section class="container">
+        <table id="results-data-table" class="table table-bordered authorsTable">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.FirstName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.LastName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.DateOfBirth)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.AuthorStatu.Name)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr class="stripped-row">
+                        <td>
+                            @Html.DisplayFor(modelItem => item.FirstName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.LastName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.DateOfBirth)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.AuthorStatu.Name)
+                        </td>
+                        <td>
+                            @Html.ActionLink("Edit", "Edit", new { id = item.AuthorID }) |
+                            @Html.ActionLink("Details", "Details", new { id = item.AuthorID }) |
+                            @Html.ActionLink("Delete", "Delete", new { id = item.AuthorID })
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </section>
+</form>
+
+
+

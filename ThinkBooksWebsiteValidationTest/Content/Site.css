@@ -1,9 +1,10 @@
-﻿body {
+﻿/*
+body {
     padding-top: 50px;
     padding-bottom: 20px;
 }
 
-/* Set padding to keep content from hitting the edges */
+/* Set padding to keep content from hitting the edges !1!
 .body-content {
     padding-left: 15px;
     padding-right: 15px;
@@ -11,14 +12,211 @@
 
 /* Override the default bootstrap behavior where horizontal description lists 
    will truncate terms that are too long to fit in the left column 
-*/
+!1!
 .dl-horizontal dt {
     white-space: normal;
 }
 
-/* Set width on the form input elements since they're 100% wide by default */
+/* Set width on the form input elements since they're 100% wide by default !1!
 input,
 select,
 textarea {
     max-width: 280px;
 }
+*/
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+hr {
+  border-top: 1px solid rgba(0, 49, 83, 0.5);
+}
+.stripped-row:nth-child(even) {
+  background-color: rgba(0, 49, 83, 0.15);
+}
+.site-btn {
+  background-color: #003153;
+  color: #FFFFFF !important;
+  border-radius: 0;
+  min-width: 230px;
+  margin-bottom: 10px;
+}
+.site-btn:hover {
+  background-color: #080808;
+}
+input,
+textarea {
+  border: 1px solid #003153;
+  padding: 0 0 0 5px;
+}
+textarea {
+  margin-bottom: 10px;
+}
+header .navbar {
+  border-radius: 0;
+  margin-top: 0;
+}
+header .navbar-inverse {
+  background-color: transparent;
+  background-color: #003153;
+  border: none;
+}
+header .navbar-header {
+  background-color: #FFFFFF;
+  border: none;
+}
+header .navbar-header .navbar-brand {
+  padding-left: 30px;
+  padding-right: 30px;
+}
+header .navbar-inverse .navbar-nav li,
+header .navbar-inverse .navbar-nav li a {
+  color: #FFFFFF;
+  letter-spacing: 0.1rem;
+}
+header .navbar-inverse .navbar-nav li ul li a {
+  color: #003153;
+}
+header .navbar-inverse .navbar-nav li ul li a:hover {
+  color: #FFFFFF;
+  background-color: #003153;
+}
+header .navbar-inverse .navbar-nav .item-right {
+  margin: 15px 30px 0 0;
+  position: absolute;
+  right: 0;
+}
+#filter-col-1 label {
+  width: 100px;
+}
+#filter-col-1 select {
+  width: 200px;
+}
+#filter-col-2 label {
+  width: 100px;
+}
+#filter-col-2 select,
+#filter-col-2 input {
+  width: 200px;
+}
+#filter-col-3 label {
+  width: 100px;
+}
+#filter-col-3 .long-label {
+  width: 220px;
+}
+#filter-col-3 input[type=checkbox] {
+  width: 20px;
+}
+#filter-col-3 select,
+#filter-col-3 input {
+  width: 200px;
+}
+#filter-col-3 .search {
+  background-color: #003153;
+  color: #FFFFFF;
+  border-radius: 0;
+}
+#filter-col-3 .search:hover {
+  background-color: #080808;
+}
+#search {
+  margin-bottom: 20px;
+}
+#search .search {
+  background-color: #003153;
+  color: #FFFFFF;
+  border-radius: 0;
+  width: 200px;
+}
+#search .search:hover {
+  background-color: #080808;
+}
+#search .total-results {
+  padding-right: 20px;
+  color: #b12727;
+}
+#results-data-table {
+  border: 1px solid rgba(0, 49, 83, 0.2);
+}
+#results-data-table table {
+  border-spacing: 10px;
+}
+#results-data-table thead > tr > th {
+  background-color: #003153;
+  padding: 0;
+}
+#results-data-table thead > tr > th button {
+  width: 100%;
+  background-color: transparent;
+  color: #FFFFFF;
+  border: none;
+  padding: 5px;
+  font-weight: 300;
+}
+#results-data-table tbody > tr > td {
+  border-top: none;
+  border-bottom: none;
+  border-left: 1px solid rgba(0, 49, 83, 0.2);
+  border-right: 1px solid rgba(0, 49, 83, 0.2);
+  text-align: center;
+}
+#results-data-table .stripped-row a {
+  text-decoration: none;
+}
+#results-data-table .stripped-row a:hover {
+  color: #080808;
+}
+#export-btn .export {
+  background-color: #003153;
+  border-radius: 0;
+  border: none;
+}
+#export-btn .export a {
+  text-decoration: none;
+  color: #FFFFFF;
+}
+#export-btn .export:hover {
+  border: none;
+  background-color: #080808;
+}
+#export-btn .export:hover a {
+  color: #FFFFFF;
+}
+#detail-data td {
+  padding-bottom: 8px;
+}
+#detail-data .title {
+  font-weight: 600;
+  width: 220px;
+  vertical-align: top;
+}
+#detail-data .data {
+  vertical-align: top;
+}
+#detail-data .data select {
+  width: 230px;
+  margin-bottom: 10px;
+}
+#detail-data .table-head {
+  background-color: #003153;
+  color: #FFFFFF;
+  font-weight: 300;
+}
+#detail-data textarea {
+  width: 100%;
+}
+#detail-data a {
+  text-decoration: none;
+}
+#detail-data a:hover {
+  color: #080808;
+}
+#detail-data .pos-right {
+  text-align: right;
+}
+#footer {
+  text-align: center;
+  padding: 30px 0;
+}
+/*# sourceMappingURL=Site.css.map */
