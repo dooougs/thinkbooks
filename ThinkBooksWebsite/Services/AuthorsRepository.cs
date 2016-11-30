@@ -2,105 +2,16 @@
 using Microsoft.Ajax.Utilities;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Web.Hosting;
 using ThinkBooksWebsite.Models;
 
 namespace ThinkBooksWebsite.Services
 {
-    public class CDFDataPriceHistoryItem
-    {
-        public int year { get; set; }
-        [nameit, oneDP]
-        public double NBV { get; set; }
-        [nameit, oneDP]
-        public double Debt { get; set; }
-        [nameit]
-        public double OtherEVAdj { get; set; }
-        [nameit]
-        public double IASPensionDeficit { get; set; }
-        [nameit]
-        public double BuyoutPensionDefecit { get; set; }
-        [nameit]
-        public double sales { get; set; }
-        [nameit]
-        public double OPF { get; set; }
-        [nameit]
-        public double Depn { get; set; }
-        [nameit]
-        public double Capex { get; set; }
-        [nameit]
-        public double FCFInOut { get; set; }
-        [nameit]
-        public double EPSp { get; set; }
-        [nameit]
-        public double DPSp { get; set; }
-    }
-
-    public class CDFDataPriceAnalysisItem
-    {
-        public double price { get; set; }
-        public double probability { get; set; }
-        public double wgtedPrice { get; set; }
-        public double evSales { get; set; }
-        public double evEbitda { get; set; }
-        public double evEbit { get; set; }
-        public double per { get; set; }
-        public double yeild { get; set; }
-        public double mktBv { get; set; }
-        public double fcfYeild { get; set; }
-    }
-    class oneDP : DisplayFormatAttribute { public oneDP() { DataFormatString = "{0:0.0}"; } }
-    class twoDP : DisplayFormatAttribute { public twoDP() { DataFormatString = "{0:0.00}"; } }
-
-    class nameit : DisplayNameAttribute
-    {
-        public nameit([CallerMemberName] string propertyName = null)
-        {
-            string displayName;
-            this.DisplayNameValue = dict.TryGetValue(propertyName, out displayName) ? displayName : propertyName;
-        }
-
-        private static readonly Dictionary<string, string> dict = new Dictionary<string, string>
-        {
-            {"NBV", "NBV £m"}
-            ,
-            {"Debt", "Debt £m Debt/(Cash)"}
-            ,
-            {"OtherEVAdj", "Other EV Adj"}
-            ,
-            {"IASPensionDeficit", "IAS Pension £m Deficit"}
-            ,
-            {"BuyoutPensionDeficit", "Bayout Pension Deficit"}
-            ,
-            {"sales", "Sales £m"}
-            ,
-            {"OPF", "OPF £m"}
-            ,
-            {"Depn", "DEpn £n"}
-            ,
-            {"Capex", "Capex £m"}
-            ,
-            {"FCFInOut", "FCF £m In/(Out)"}
-            ,
-            {"EPSp", "EPS p"}
-            ,
-            {"DPSp", "DPS p"}
-        };
-    }
-
-
-
-
-
-
     public class AuthorsViewModel
     {
         public List<Author> Authors { get; set; }
